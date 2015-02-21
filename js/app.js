@@ -1,3 +1,20 @@
+function whichTransitionEvent(){
+    var t;
+    var el = document.createElement('fakeelement');
+    var transitions = {
+      'transition':'transitionend',
+      'OTransition':'oTransitionEnd',
+      'MozTransition':'transitionend',
+      'WebkitTransition':'webkitTransitionEnd'
+    }
+
+    for(t in transitions){
+        if( el.style[t] !== undefined ){
+            return transitions[t];
+        }
+    }
+}
+var transitionEvent = whichTransitionEvent();
 
 var global;
 var map;
@@ -365,13 +382,20 @@ function listBoxClosure() {
 		delete selectedCache[adId];
 		xcess.shortlistedCount--;
 		get('short-list-shortlisted-count').innerHTML = xcess.shortlistedCount;
-		get('short-list').removeChild(get('shortlist-' + adId));
-		
-		if (xcess.shortlistedCount==0) {
-			var template = document.getElementById('short_list_empty_el').innerHTML;
-			get('short-list').innerHTML+=Mustache.render(template, {message: 'Shortlist is empty'});
-		}
-		
+
+		get('shortlist-'+adId).className = "list-item-main unshortlist";
+		transitionEvent && get('shortlist-'+adId).addEventListener(transitionEvent, function() {
+			console.log(transitionEvent);
+			console.log('Transition complete!  This is the callback, no library needed!');
+			
+			get('short-list').removeChild(get('shortlist-' + adId));
+
+			if (xcess.shortlistedCount==0) {
+				var template = document.getElementById('short_list_empty_el').innerHTML;
+				get('short-list').innerHTML+=Mustache.render(template, {message: 'Shortlist is empty'});
+			}
+		});
+
 		var shortListIcon = get('mainlist-action-'+adId);
 		shortListIcon.dataset.value = "0";
 		shortListIcon.dataset.icon = "\uE016";

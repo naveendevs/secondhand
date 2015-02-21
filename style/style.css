@@ -84,6 +84,10 @@ input::-moz-selection {
 	top:80px;
 }
 
+.list-item-main.unshortlist{
+	opacity:0;
+}
+
 .list-item-main {
 	cursor: pointer;
 	position:relative;
@@ -94,16 +98,20 @@ input::-moz-selection {
 	padding:10px 10px 10px 10px;
 	border-bottom: 1px solid #eeeeee;
 	display:inline-block;
-    -webkit-transition-property: box-shadow, border; /* Safari */
-    -webkit-transition-duration: .2s; /* Safari */
-    transition-property: box-shadow, border;
-    transition-duration: .2s;	
+    //-webkit-transition-property: box-shadow, border; /* Safari */
+    //-webkit-transition-duration: .2s; /* Safari */
+    //transition-property: box-shadow, border;
+    //transition-duration: .2s;	
+    -webkit-transition-property: opacity; /* Safari */
+    -webkit-transition-duration: .3s; /* Safari */
+    transition-property: opacity;
+    transition-duration: .3s;	
 }
 
 .list-item-main:hover {
-    -moz-box-shadow: 3px 3px 15px #eeeeee;
-    -webkit-box-shadow: 3px 3px 15px #eeeeee;
-    box-shadow:  3px 3px 15px #eeeeee;
+    //-moz-box-shadow: 3px 3px 15px #eeeeee;
+    //-webkit-box-shadow: 3px 3px 15px #eeeeee;
+    //box-shadow:  3px 3px 15px #eeeeee;
 	background:#f6f6f6;
 }
 
