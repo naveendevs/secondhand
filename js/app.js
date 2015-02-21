@@ -411,7 +411,7 @@ function listBoxClosure() {
 			});
 		} else {
 			get('short-list').removeChild(get('shortlist-' + adId));
-			mapObj.unhighlightMarker(d.adId);
+			mapObj.unhighlightMarker(adId);
 			if (xcess.shortlistedCount==0) {
 				var template = document.getElementById('short_list_empty_el').innerHTML;
 				get('short-list').innerHTML+=Mustache.render(template, {message: 'Shortlist is empty'});
