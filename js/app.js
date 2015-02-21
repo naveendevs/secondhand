@@ -324,8 +324,8 @@ function initializeMap() {
 			selectMarkerInfoBox.setContent(selectMarkerContent);
 			selectMarkerInfoBox.open(map, markerCache[_data.adId]);
 		},
-		unhighlightMarker: function(_data) {
-			markerCache[_data.adId].setIcon(imageMarker);
+		unhighlightMarker: function(_id) {
+			markerCache[_id].setIcon(imageMarker);
 			selectMarkerInfoBox.close();
 		}
 	}
@@ -389,7 +389,7 @@ function listBoxClosure() {
 			mapObj.highlightMarker(data);
 		});
 		get('shortlist-'+data.adId).addEventListener("mouseout", function(){ 
-			mapObj.unhighlightMarker(data);
+			mapObj.unhighlightMarker(data.adId);
 		});
 	}
 
@@ -403,6 +403,7 @@ function listBoxClosure() {
 		if(transitionEvent && waitForTransitionEvent) {
 			get('shortlist-'+adId).addEventListener(transitionEvent, function() {
 				get('short-list').removeChild(get('shortlist-' + adId));
+				mapObj.unhighlightMarker(adId);
 				if (xcess.shortlistedCount==0) {
 					var template = document.getElementById('short_list_empty_el').innerHTML;
 					get('short-list').innerHTML+=Mustache.render(template, {message: 'Shortlist is empty'});
@@ -410,6 +411,7 @@ function listBoxClosure() {
 			});
 		} else {
 			get('short-list').removeChild(get('shortlist-' + adId));
+			mapObj.unhighlightMarker(d.adId);
 			if (xcess.shortlistedCount==0) {
 				var template = document.getElementById('short_list_empty_el').innerHTML;
 				get('short-list').innerHTML+=Mustache.render(template, {message: 'Shortlist is empty'});
@@ -444,7 +446,7 @@ function listBoxClosure() {
 					mapObj.highlightMarker(d);
 				});
 				get('mainlist-'+d.adId).addEventListener("mouseout", function(){ 
-					mapObj.unhighlightMarker(d);
+					mapObj.unhighlightMarker(d.adId);
 				});
 			};
 			inner(data[i]);
