@@ -86,6 +86,8 @@ input::-moz-selection {
 
 .list-item-main.unshortlist{
 	opacity:0;
+	max-height:0px;
+	overflow:hidden;
 }
 
 .list-item-main {
@@ -93,7 +95,7 @@ input::-moz-selection {
 	position:relative;
 	box-sizing: border-box;	
 	width:100%;
-	height:auto;
+	max-height:500px;
 	float:left;
 	padding:10px 10px 10px 10px;
 	border-bottom: 1px solid #eeeeee;
@@ -102,10 +104,10 @@ input::-moz-selection {
     //-webkit-transition-duration: .2s; /* Safari */
     //transition-property: box-shadow, border;
     //transition-duration: .2s;	
-    -webkit-transition-property: opacity; /* Safari */
-    -webkit-transition-duration: .3s; /* Safari */
-    transition-property: opacity;
-    transition-duration: .3s;	
+    -webkit-transition: max-height .3s ease-in-out;
+    transition: max-height .3s ease-in-out;	
+	transition-property: max-height,opacity;
+	-webkit-transition-property:max-height,opacity;
 }
 
 .list-item-main:hover {

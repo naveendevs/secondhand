@@ -368,7 +368,7 @@ function listBoxClosure() {
 		mainListIcon.className = "shortlist-action-icon selected icon left";
 		
 		get('shortlist-action-'+data.adId).addEventListener("mousedown", function(){ 
-			unShortlist(data.adId);
+			unShortlist(data.adId, true);
 		});
 		get('shortlist-'+data.adId).addEventListener("mouseover", function(){ 
 			mapObj.highlightMarker(data.adId);
@@ -378,23 +378,28 @@ function listBoxClosure() {
 		});
 	}
 
-	function unShortlist(adId) {
+	function unShortlist(adId, waitForTransitionEvent) {
 		delete selectedCache[adId];
 		xcess.shortlistedCount--;
 		get('short-list-shortlisted-count').innerHTML = xcess.shortlistedCount;
 
 		get('shortlist-'+adId).className = "list-item-main unshortlist";
-		transitionEvent && get('shortlist-'+adId).addEventListener(transitionEvent, function() {
-			console.log(transitionEvent);
-			console.log('Transition complete!  This is the callback, no library needed!');
-			
+		
+		if(transitionEvent && waitForTransitionEvent) {
+			get('shortlist-'+adId).addEventListener(transitionEvent, function() {
+				get('short-list').removeChild(get('shortlist-' + adId));
+				if (xcess.shortlistedCount==0) {
+					var template = document.getElementById('short_list_empty_el').innerHTML;
+					get('short-list').innerHTML+=Mustache.render(template, {message: 'Shortlist is empty'});
+				}
+			});
+		} else {
 			get('short-list').removeChild(get('shortlist-' + adId));
-
 			if (xcess.shortlistedCount==0) {
 				var template = document.getElementById('short_list_empty_el').innerHTML;
 				get('short-list').innerHTML+=Mustache.render(template, {message: 'Shortlist is empty'});
 			}
-		});
+		}
 
 		var shortListIcon = get('mainlist-action-'+adId);
 		shortListIcon.dataset.value = "0";
@@ -417,7 +422,7 @@ function listBoxClosure() {
 					if (shortListIcon.dataset.value == "0") {
 						shortlist(d);
 					} else {
-						unShortlist(d.adId)
+						unShortlist(d.adId, false)
 					}
 				});
 				get('mainlist-'+d.adId).addEventListener("mouseover", function(){ 
