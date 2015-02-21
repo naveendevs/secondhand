@@ -1,0 +1,253 @@
+[
+    {
+        "adId": 111,
+        "userId": 11,
+        "postedDateTime": 1421193600000,
+        "title": "Apple iPhone 5 (16 GB)",
+        "price": "15,000",
+        "negotiable": true,
+        "usedFor": "2 Years",
+        "condition": "Like New",
+        "location": {
+            "id": 1,
+            "userId": 1,
+            "line1": null,
+            "line2": null,
+            "area": "1st Block, Koramangala",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "lat": 12.928855,
+            "lng": 77.635705
+        },
+        "coverPhoto": {
+                "id": 10001,
+                "url": "./cdn/pic2.jpg"
+        }
+    },
+    {
+        "adId": 222,
+        "userId": 11,
+        "postedDateTime": 1421193600000,
+        "title": "Apple iPhone 5 (16 GB)",
+        "price": "18,000",
+        "negotiable": true,
+        "usedFor": "2 Years",
+        "condition": "Like New",
+        "location": {
+            "id": 1,
+            "userId": 1,
+            "line1": null,
+            "line2": null,
+            "area": "1st Block, Koramangala",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "lat": 12.926471,
+            "lng": 77.640061
+        },
+        "coverPhoto": {
+                "id": 10001,
+                "url": "./cdn/pic4.jpg"
+        }
+    },
+    {
+        "adId": 333,
+        "userId": 11,
+        "postedDateTime": 1421193600000,
+        "title": "Apple iPhone 5 (16 GB)",
+        "price": "18,000",
+        "negotiable": true,
+        "usedFor": "2 Years",
+        "condition": "Like New",
+        "location": {
+            "id": 1,
+            "userId": 1,
+            "line1": null,
+            "line2": null,
+            "area": "1st Block, Koramangala",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "lat": 12.928897,
+            "lng": 77.630813
+        },
+        "coverPhoto": {
+                "id": 10001,
+                "url": "./cdn/pic1.jpg"
+        }
+    },
+    {
+        "adId": 444,
+        "userId": 11,
+        "postedDateTime": 1421193600000,
+        "title": "Apple iPhone 5 (16 GB)",
+        "price": "18,000",
+        "negotiable": true,
+        "usedFor": "2 Years",
+        "condition": "Like New",
+        "location": {
+            "id": 1,
+            "userId": 1,
+            "line1": null,
+            "line2": null,
+            "area": "1st Block, Koramangala",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "lat": 12.936990,
+            "lng": 77.627423
+        },
+        "coverPhoto": {
+                "id": 10001,
+                "url": "./cdn/pic3.jpg"
+        }
+    },
+    {
+        "adId": 555,
+        "userId": 11,
+        "postedDateTime": 1421193600000,
+        "title": "Apple iPhone 5 (16 GB)",
+        "price": "18,000",
+        "negotiable": true,
+        "usedFor": "2 Years",
+        "condition": "Like New",
+        "location": {
+            "id": 1,
+            "userId": 1,
+            "line1": null,
+            "line2": null,
+            "area": "1st Block, Koramangala",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "lat": 28.4302713,
+            "lng": 77.0325254
+        },
+        "coverPhoto": {
+                "id": 10001,
+                "url": "./cdn/pic4.jpg"
+        }
+    },
+    {
+        "adId": 666,
+        "userId": 11,
+        "postedDateTime": 1421193600000,
+        "title": "Apple iPhone 5 (16 GB)",
+        "price": "18,000",
+        "negotiable": true,
+        "usedFor": "2 Years",
+        "condition": "Like New",
+        "location": {
+            "id": 1,
+            "userId": 1,
+            "line1": null,
+            "line2": null,
+            "area": "1st Block, Koramangala",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "lat": 28.4302713,
+            "lng": 77.0325254
+        },
+        "coverPhoto": {
+                "id": 10001,
+                "url": "./cdn/pic2.jpg"
+        }
+    },
+    {
+        "adId": 777,
+        "userId": 11,
+        "postedDateTime": 1421193600000,
+        "title": "Apple iPhone 5 (16 GB)",
+        "price": "15,000",
+        "negotiable": true,
+        "usedFor": "2 Years",
+        "condition": "Like New",
+        "location": {
+            "id": 1,
+            "userId": 1,
+            "line1": null,
+            "line2": null,
+            "area": "1st Block, Koramangala",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "lat": 28.4302713,
+            "lng": 77.0325254
+        },
+        "coverPhoto": {
+                "id": 10001,
+                "url": "./cdn/pic2.jpg"
+        }
+    },
+    {
+        "adId": 888,
+        "userId": 11,
+        "postedDateTime": 1421193600000,
+        "title": "Apple iPhone 5 (16 GB)",
+        "price": "18,000",
+        "negotiable": true,
+        "usedFor": "2 Years",
+        "condition": "Like New",
+        "location": {
+            "id": 1,
+            "userId": 1,
+            "line1": null,
+            "line2": null,
+            "area": "1st Block, Koramangala",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "lat": 28.4302713,
+            "lng": 77.0325254
+        },
+        "coverPhoto": {
+                "id": 10001,
+                "url": "./cdn/pic4.jpg"
+        }
+    },
+    {
+        "adId": 999,
+        "userId": 11,
+        "postedDateTime": 1421193600000,
+        "title": "Apple iPhone 5 (16 GB)",
+        "price": "18,000",
+        "negotiable": true,
+        "usedFor": "2 Years",
+        "condition": "Like New",
+        "location": {
+            "id": 1,
+            "userId": 1,
+            "line1": null,
+            "line2": null,
+            "area": "1st Block, Koramangala",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "lat": 28.4302713,
+            "lng": 77.0325254
+        },
+        "coverPhoto": {
+                "id": 10001,
+                "url": "./cdn/pic1.jpg"
+        }
+    },
+    {
+        "adId": 1111,
+        "userId": 11,
+        "postedDateTime": 1421193600000,
+        "title": "Apple iPhone 5 (16 GB)",
+        "price": "18,000",
+        "negotiable": true,
+        "usedFor": "2 Years",
+        "condition": "Like New",
+        "location": {
+            "id": 1,
+            "userId": 1,
+            "line1": null,
+            "line2": null,
+            "area": "1st Block, Koramangala",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "lat": 28.4302713,
+            "lng": 77.0325254
+        },
+        "coverPhoto": {
+                "id": 10001,
+                "url": "./cdn/pic3.jpg"
+        }
+    }
+	
+]

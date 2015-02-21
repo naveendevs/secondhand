@@ -1,0 +1,2115 @@
+<!doctype html>
+<html>
+<head>
+	<title>SecondHand.com</title>
+	<!-- CSS -->
+	<link rel="stylesheet" type="text/css" href="./style/style.css">
+
+	<!-- JS Libraries-->
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDy_hwukpPRvw24Tr0J2sAM6iofOHQEThk"></script>
+	<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
+	<!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.27/angular.min.js"></script> -->
+	<script type="text/javascript" src="js/lib/mustache.min.js"></script>
+
+	<!-- JS APP -->
+	<script type="text/javascript" src="js/nCalendar.js"></script>
+	<script type="text/javascript" src="js/app.js"></script>
+
+	<!-- MUSTACHE TEMPLATES-->
+	<script id="short_list_el" type="text/html">
+		<div class="list-item-main" id="shortlist-{{adId}}">
+			<div class="shortlist-item-pic" style="background-image: url({{coverPhoto.url}});"></div>
+			<div class="shortlist-item-content">
+				<div class="list-item-icons">
+					<div class="shortlist-action-icon selected icon left" data-icon="&#xe015;" data-value="0" id="shortlist-action-{{adId}}"></div>
+				</div>
+				<div class="list-item-title">{{title}}</div>
+				<div class="list-item-location"><div class="icon left" data-icon="&#xe006;"></div>{{location.area}}</div>
+				<div class="list-item-conditionWrapper">
+					<div class="list-item-location left">Used For <span class="list-item-highlight">2 years</span></div>
+					<div class="list-item-location left" style="margin-left:15px;">Condition <span class="list-item-highlight">Bad</span></div>
+				</div>
+				<div class="list-item-price"><div class="list-item-price-currency icon left" data-icon="&#xe017;"></div>{{price}}</div>
+				<div class="list-item-time">{{displaypostedDateTime}}</div>
+			</div>
+		</div>
+	</script>
+
+	<script id="main_list_el" type="text/html">
+		<div class="list-item-main" id="mainlist-{{adId}}">
+			<div class="list-item-pic" style="background-image: url({{coverPhoto.url}});"></div>
+			<div class="list-item-content">
+				<div class="list-item-icons">
+					<div class="shortlist-action-icon icon left" data-icon="&#xe016;" data-value="0" id="mainlist-action-{{adId}}"></div>
+				</div>
+				<div class="list-item-title">{{title}}</div>
+				<div class="list-item-location"><div class="icon left" data-icon="&#xe006;"></div>{{location.area}}</div>
+				<div class="list-item-conditionWrapper">
+					<div class="list-item-location left">Used For <span class="list-item-highlight">2 years</span></div>
+					<div class="list-item-location left" style="margin-left:15px;">Condition <span class="list-item-highlight">Bad</span></div>
+				</div>
+				<div class="list-item-price"><div class="list-item-price-currency icon left" data-icon="&#xe017;"></div>{{price}}</div>
+				<div class="list-item-time">{{displaypostedDateTime}}</div>
+			</div>
+		</div>
+	</script>
+	
+	<script id="short_list_empty_el" type="text/html">
+		<div class="shortlist-empty-message">
+			{{message}}
+		</div>
+	</script>
+    <script type="text/javascript">
+
+
+
+//common JS
+function detailBoxClosure() {
+	var isActive = false;
+	var isRequestBoxActive = false;
+	var isMessageBoxActive = false;
+
+    var photoIndex = 0;
+
+	var requestObj = {
+		noOfGuests: 1,
+		visitingDate: '',
+		visitingTime: '',
+		message: ''
+	};
+		
+	var setMask = function(flag) {
+		if(flag) {
+			document.getElementById('detail-box-loading').style.display="block";
+		} else {
+			document.getElementById('detail-box-loading').style.display="none";
+		}
+	};
+
+	return {
+		reset: function() {
+			document.getElementById('detail-box-content').scrollTop = 0;
+			document.getElementById('detail-box-tab-invite').className = "detail-box-content-tabs-tab active";
+			document.getElementById('detail-box-tab-profile').className = "detail-box-content-tabs-tab";
+			document.getElementById('detail-box-tab-history').className = "detail-box-content-tabs-tab";
+			document.getElementById('details-box-sub-actions').style.display = "none";
+			document.getElementById('details-box-request-field-guests').innerHTML = requestObj.noOfGuests;
+			this.hideRequestBox();
+			this.hideMessageBox();
+		},
+		open: function() {
+			setMask(true);
+			this.reset();
+			var xmlhttp;
+			if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
+				xmlhttp=new XMLHttpRequest();
+			}
+			else{ // code for IE6, IE5
+				xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			xmlhttp.onreadystatechange=function() {
+				if (xmlhttp.readyState==4 && xmlhttp.status==200){
+					setMask(false);
+					var get = function(el) { return document.getElementById(el) };
+					var data = JSON.parse(xmlhttp.responseText);
+					
+					get('dbx-name').innerHTML = data.invite.user.fullName;
+
+					get('dbx-sexagelocation').innerHTML = data.invite.user.gender;
+					get('dbx-sexagelocation').innerHTML += ' | ' + getAge(data.invite.user.dob) + ' yrs';
+					get('dbx-sexagelocation').innerHTML += ' | ' + data.invite.user.address.area + ', ' + data.invite.user.address.city;
+					
+					if (data.invite.user.phoneVerified == 'Yes' && data.invite.user.creditCardVerified == 'Yes') {
+						get('dbx-verified').style.display = 'block';
+					} else {
+						get('dbx-verified').style.display = 'none';
+					}
+
+					//photos
+					get("dbx-photos").innerHTML="";
+					for (var x in data.invite.user.photos) {
+						if (x==0) {
+							get("dbx-photos").innerHTML += "<div class='detail-box-content-photo visible' style='background-image:URL(" + data.invite.user.photos[x].url + ")'></div>";
+						} else {
+							get("dbx-photos").innerHTML += "<div class='detail-box-content-photo' style='background-image:URL(" + data.invite.user.photos[x].url + ")'></div>";
+						}
+					}
+					
+					//invite details
+					get("dbx-offering").innerHTML="";
+					for (var x in data.invite.inviteOfferings) {
+						get("dbx-offering").innerHTML += "<div class='details-x-invite-offering'><div class='details-x-invite-offering-head'>"+ data.invite.inviteOfferings[x].head +"</div><div class='details-x-invite-offering-desc'>"+ data.invite.inviteOfferings[x].desc +"</div></div>";
+					}
+					get('dbx-requestsReceived').innerHTML = data.invite.requestsReceived;
+					get('dbx-requestsAccepted').innerHTML = data.invite.requestsAccepted;
+					get('dbx-lastAttendedDateTime').innerHTML = getAgo(data.invite.lastAttendedDateTime);
+					get('dbx-postedDateTime').innerHTML = getAgo(data.invite.postedDateTime);
+					get('dbx-preferredDay').innerHTML = data.invite.inviteDetail.preferredDay;
+					get('dbx-preferredTime').innerHTML = data.invite.inviteDetail.preferredTime;
+					
+					get('dbx-maxGuestsAllowed').innerHTML = data.invite.inviteDetail.maxGuestsAllowed;
+					get('dbx-preferredGender').innerHTML = data.invite.inviteDetail.preferredGender;
+					get('dbx-smokingAllowed').innerHTML = data.invite.inviteDetail.smokingAllowed;
+					get('dbx-kidsAllowed').innerHTML = data.invite.inviteDetail.kidsAllowed;
+					get('dbx-petsAllowed').innerHTML = data.invite.inviteDetail.petsAllowed;
+					get('dbx-overnightStay').innerHTML = data.invite.inviteDetail.overnightStay;
+					
+					//user profile
+					get('dbx-profileHead').innerHTML = data.invite.user.firstName.toUpperCase();
+					get('dbx-phoneVerified').innerHTML = data.invite.user.phoneVerified;
+					get('dbx-creditCardVerified').innerHTML = data.invite.user.creditCardVerified;
+
+					get('dbx-stayingWith').innerHTML = data.invite.user.userInfo.stayingWith;
+					get('dbx-stayingIn').innerHTML = data.invite.user.userInfo.stayingIn;
+					get('dbx-workDetails').innerHTML = data.invite.user.userInfo.workDetails;
+					get('dbx-schoolDetails').innerHTML = data.invite.user.userInfo.schoolDetails;
+					get('dbx-music').innerHTML = data.invite.user.userInfo.music;
+					get('dbx-movie').innerHTML = data.invite.user.userInfo.movie;
+					get('dbx-sports').innerHTML = data.invite.user.userInfo.sports;
+					get('dbx-food').innerHTML = data.invite.user.userInfo.food;
+					get('dbx-interests').innerHTML = data.invite.user.userInfo.interests;
+					get('dbx-smokes').innerHTML = data.invite.user.userInfo.smokes;
+					get('dbx-drinks').innerHTML = data.invite.user.userInfo.drinks;
+
+					//activity
+					get('dbx-invitesHosted').innerHTML = data.invite.user.userActivity.invitesHosted;
+					get('dbx-invitesAttended').innerHTML = data.invite.user.userActivity.invitesAttended;
+					get('dbx-feedbackCount').innerHTML = data.invite.user.userActivity.feedbackCount;
+					get('dbx-lastLogin').innerHTML = getAgo(data.invite.user.userActivity.lastLogin);
+
+					get('dbx-feedbacks').innerHTML = "";
+					for (var x in data.invite.user.feedbacks) {
+						var tmp = '<div class="details-x-feedback clearfix">';
+						tmp += '<img src="images/batar.png">';
+						tmp += '<div class="details-x-feedback-content"><div class="details-x-feedback-content-arrow icon" data-icon="&#xe002;"></div>';
+						tmp += '<p>' + data.invite.user.feedbacks[x].message + '</p>';
+						tmp += '<div class="details-x-feedback-content-time">' + getAgo(data.invite.user.feedbacks[x].timestamp) + '</div></div></div>';
+						get("dbx-feedbacks").innerHTML += tmp;
+					}
+
+					document.getElementById('detail-box').style.left='0px';
+					document.getElementById('detail-box-gallery-counter').innerHTML = (photoIndex+1)+" of "+ document.getElementsByClassName('detail-box-content-photo').length;
+
+					isActive=true;
+				}
+			}
+			//xmlhttp.open("GET","http://localhost:1337/getInvite?id=111",true);
+			xmlhttp.open("GET","./invite_detail.json",true);
+			xmlhttp.send();
+		},
+		init: function() {
+			//this.reset();
+			//document.getElementById('detail-box').style.left='0px';
+			//document.getElementById('detail-box-gallery-counter').innerHTML = (photoIndex+1)+" of "+ document.getElementsByClassName('detail-box-content-photo').length;
+			document.getElementById('detail-box-tab-invite').addEventListener("mousedown", function(){
+				document.getElementById('detail-box-content').scrollTop = document.getElementById('detail-box-content-invite').offsetTop-160;
+			});
+			document.getElementById('detail-box-tab-profile').addEventListener("mousedown", function(){
+				document.getElementById('detail-box-content').scrollTop = document.getElementById('detail-box-content-profile').offsetTop-160;
+			});
+			document.getElementById('detail-box-tab-history').addEventListener("mousedown", function(){
+				document.getElementById('detail-box-content').scrollTop = document.getElementById('detail-box-content-history').offsetTop-160;
+			});
+			
+			document.getElementById('detail-box-content').addEventListener("scroll", function(){
+			
+				//photo & tabs affix
+				if(document.getElementById('detail-box-content').scrollTop>175) {
+					document.getElementById('detail-box-top').className = "detail-box-top-fixed";
+					document.getElementById('detail-box-content').style.paddingTop = '336px';
+				} else {
+					document.getElementById('detail-box-top').className = "detail-box-top";
+					document.getElementById('detail-box-content').style.paddingTop = '0px';
+				}
+				
+				//tab selection on scroll
+				if(document.getElementById('detail-box-content').scrollTop >= document.getElementById('detail-box-content-history').offsetTop-175 || document.getElementById('detail-box-content').scrollTop >= (document.getElementById('detail-box-content').scrollHeight - document.getElementById('detail-box-content').clientHeight)) {
+					document.getElementById('detail-box-tab-invite').className = "detail-box-content-tabs-tab";
+					document.getElementById('detail-box-tab-profile').className = "detail-box-content-tabs-tab";
+					document.getElementById('detail-box-tab-history').className = "detail-box-content-tabs-tab active";
+				} 
+				else if(document.getElementById('detail-box-content').scrollTop >= document.getElementById('detail-box-content-profile').offsetTop-175) {
+					document.getElementById('detail-box-tab-invite').className = "detail-box-content-tabs-tab";
+					document.getElementById('detail-box-tab-profile').className = "detail-box-content-tabs-tab active";
+					document.getElementById('detail-box-tab-history').className = "detail-box-content-tabs-tab";
+				} 
+				else if(document.getElementById('detail-box-content').scrollTop >= 0) {
+					document.getElementById('detail-box-tab-invite').className = "detail-box-content-tabs-tab active";
+					document.getElementById('detail-box-tab-profile').className = "detail-box-content-tabs-tab";
+					document.getElementById('detail-box-tab-history').className = "detail-box-content-tabs-tab";
+				}
+			});
+		},
+		close: function() {
+			if (isActive==true) {
+				//reset stuff
+				document.getElementById('details-box-sub-actions').style.display = "none";
+				document.getElementById('detail-box').style.left='-500px';
+				isActive=false;
+			}
+		},
+		doEscapeAction: function() {
+			if(isRequestBoxActive || isMessageBoxActive) {
+				this.hideRequestBox();
+				this.hideMessageBox();
+			} else if(false) {
+				//close sub menus
+			} else {
+				this.close();
+			}
+		},
+		scrollToTabInvite: function() {
+			if (!isActive) {
+				this.open();
+			}
+			document.getElementById('detail-box-content').scrollTop = document.getElementById('detail-box-content-invite').offsetTop-160;
+		},
+		scrollToTabProfile: function() {
+			if (!isActive) {
+				this.open();
+			}
+			document.getElementById('detail-box-content').scrollTop = document.getElementById('detail-box-content-profile').offsetTop-160;
+		},
+		scrollToTabHistory: function() {
+			if (!isActive) {
+				this.open();
+			}
+			document.getElementById('detail-box-content').scrollTop = document.getElementById('detail-box-content-history').offsetTop-160;
+		},
+		showAltMenu: function() {
+			if (document.getElementById('details-box-sub-actions').style.display=='block') {
+				document.getElementById('details-box-sub-actions').style.display = "none";
+			}
+			else {
+				document.getElementById('details-box-sub-actions').style.display = "block";
+			}
+		},
+		//Request Box methods
+		showRequestBox: function() {
+			if (!isActive) {
+				this.open();
+			}
+			if (isRequestBoxActive) {
+				this.hideRequestBox();
+			} else {
+				if(isMessageBoxActive) {
+					this.hideMessageBox();
+				}
+				isRequestBoxActive=true;
+				document.getElementById('details-box-send-request').style.bottom = '40px';
+			}
+		},
+		hideRequestBox: function() {
+			cal.hide();
+			document.getElementById('details-box-send-request').style.bottom = document.getElementById('details-box-send-request').clientHeight*-1+'px';
+			isRequestBoxActive=false;
+		},
+		requestBoxDecreaseGuest: function() {
+			if (requestObj.noOfGuests>1) {
+				requestObj.noOfGuests--;
+				document.getElementById('details-box-request-field-guests').innerHTML = requestObj.noOfGuests;
+			}
+		},
+		requestBoxIncreaseGuest: function() {
+			if (requestObj.noOfGuests<5) {
+				requestObj.noOfGuests++;
+				document.getElementById('details-box-request-field-guests').innerHTML = requestObj.noOfGuests;
+			}
+		},
+		//Message Box methods
+		showMessageBox: function() {
+			if (isMessageBoxActive) {
+				this.hideMessageBox();
+			} else {
+				if(isRequestBoxActive) {
+					this.hideRequestBox();
+				}
+				isMessageBoxActive=true;
+				document.getElementById('details-box-message').style.bottom = '40px';
+			}
+		},
+		hideMessageBox: function() {
+			document.getElementById('details-box-message').style.bottom = document.getElementById('details-box-message').clientHeight*-1+'px';
+			isMessageBoxActive=false;
+		},
+		getIsActive: function() {
+			return isActive;
+		},
+		next:function(){
+			if(isActive && photoIndex < document.getElementsByClassName('detail-box-content-photo').length-1) {
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex].style.webkitTransform='translate(-445px, 0px)';
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex].style.transform='translate(-445px, 0px)';
+
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex+1].style.webkitTransform='translate(0px, 0px)';
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex+1].style.transform='translate(0px, 0px)';
+
+				photoIndex++;
+				document.getElementById('detail-box-gallery-counter').innerHTML = (photoIndex+1)+" of "+ document.getElementsByClassName('detail-box-content-photo').length;
+			}
+			return photoIndex;
+		},
+		prev:function(){
+			if(isActive && photoIndex>0) {
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex].style.webkitTransform='translate(445px, 0px)';
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex].style.transform='translate(445px, 0px)';
+
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex-1].style.webkitTransform='translate(0px, 0px)';
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex-1].style.transform='translate(0px, 0px)';
+
+				photoIndex--;
+				document.getElementById('detail-box-gallery-counter').innerHTML = (photoIndex+1)+" of "+ document.getElementsByClassName('detail-box-content-photo').length;
+			}
+			return photoIndex;
+		}
+	}
+};
+var detailBox = new detailBoxClosure();
+var cal;
+</script>
+
+<style>
+html, body {
+	line-height:1.4;
+    width:100%;
+    height:100%;
+    padding:0;
+    margin:0;
+	overflow-y:hidden;
+}
+
+.left {
+	float:left;
+}
+
+::selection {
+  background: transparent;
+}
+::-moz-selection {
+  background: transparent;
+}
+
+@font-face {
+	font-family: 'naveen-font';
+	src:url('fonts/naveen-font.eot');
+	src:url('fonts/naveen-font.eot?#iefix') format('embedded-opentype'),
+		url('fonts/naveen-font.woff') format('woff'),
+		url('fonts/naveen-font.ttf') format('truetype'),
+		url('fonts/naveen-font.svg#naveen-font') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+.icon[data-icon]:before {
+	font-family: 'naveen-font';
+	content: attr(data-icon);
+	font-weight: 400;
+	font-variant: normal;
+	text-transform: none;
+	display:block;
+	zoom:1;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+body {
+	font-size:13px;
+	color: #333333;
+	font-family: "Open Sans","Helvetica Neue",Helvetica,Calibri,Arial,sans-serif;
+}
+
+input,textarea {
+	border:1px solid #aaaaaa;
+	outline: none;
+}
+
+.header-box {
+	position:fixed;
+	z-index:99999;
+	background-color: #0a3151;
+	background-color: #005387;
+	height: 40px;
+	width:100%;
+	border:0;
+}
+.filter-box {
+	position:fixed;
+	z-index:99999;
+	background-color: #005387;
+	background-color: #0a3151;
+	height: 40px;
+	width:100%;
+    -moz-box-shadow: 0px 1px 1px #585858;
+    -webkit-box-shadow: 0px 1px 1px #585858;
+    box-shadow:  0px 1px 1px #585858;
+	border:0;
+}
+
+.map-infobox {
+	line-height:15px;
+	text-align:center;
+	border:1px solid #999999;
+	background:#fefefe;
+	padding:5px 10px;
+    -moz-box-shadow: 2px 2px 8px #585858;
+    -webkit-box-shadow: 2px 2px 8px #888888;
+    box-shadow: 2px 2px 8px #888888;
+}
+.map-infobox-highlight {
+	font-weight:700;
+}
+
+.map-ui-zoomin {
+	position:absolute;
+	width:32px;
+	height:32px;
+	background:URL(images/zoomin_marker.png);
+	top:10px;
+	left:10px;
+	z-index:1;
+	opacity:.8;
+    -webkit-transition-property: opacity; /* Safari */
+    -webkit-transition-duration: .2s; /* Safari */
+    transition-property: opacity;
+    transition-duration: .2s;
+}
+.map-ui-zoomin:hover { 
+	opacity:1;
+	cursor:pointer;
+}
+.map-ui-zoomout {
+	position:absolute;
+	width:32px;
+	height:32px;
+	background:URL(images/zoomout_marker.png);
+	top:42px;
+	z-index:1;
+	left:10px;
+	opacity:.8;
+    -webkit-transition-property: opacity; /* Safari */
+    -webkit-transition-duration: .2s; /* Safari */
+    transition-property: opacity;
+    transition-duration: .2s;
+}
+.map-ui-zoomout:hover { 
+	opacity:1;
+	cursor:pointer;
+}
+.header-content {
+	line-height: 40px;
+	font-size:16px;
+	color:#fefefe;
+}
+
+.header-content-logo:hover{
+	color:#fff;
+	cursor:pointer;
+}
+.header-content-logo{
+	float:left;
+	margin-left:10px;
+	width:200px;
+	font-size:20px;
+	font-weight:600;
+	color:#fafafa;
+    -moz-text-shadow: 2px 2px 2px #585858;
+    -webkit-text-shadow: 2px 2px 2px #585858;
+    text-shadow: 2px 2px 2px #555555;
+    -webkit-transition-property: color;
+    -webkit-transition-duration: 1s;
+    transition-property: color;
+    transition-duration: 1s;	
+}
+
+.header-content-search{
+	float:left;
+	margin-right:20px;
+}
+.header-content-search input{
+	width:290px;
+	line-height:25px;
+	padding:0 10px;
+	border:none;
+	border-radius: 3px;
+	opacity:1;
+	display:inline-block;
+	vertical-align:middle;
+}
+
+.header-nav-wrapper {
+	float:right;
+	margin:0 10px 0 0;
+}
+.header-nav-menu {
+	float:left;
+	color:#dddddd;
+	font-size:13px;
+    -moz-text-shadow: 2px 2px 2px #585858;
+    -webkit-text-shadow: 2px 2px 2px #585858;
+    text-shadow: 1px 1px 1px #444444;
+	padding: 0 10px;
+    -webkit-transition-property: color; /* Safari */
+    -webkit-transition-duration: .1s; /* Safari */
+    transition-property: color;
+    transition-duration: .1s;
+}
+.header-nav-menu:hover {
+	color:#eeeeee;
+	cursor:pointer;
+}
+
+.filters-wrapper {
+	padding:0 10px 10px 10px;
+	height:auto;
+	float:left;
+	width:220px;
+	margin:15px 0 0 20px;
+	border-right:1px solid #f1f1f1;
+	overflow-y:auto;
+}
+
+.footer-wrapper {
+	height:auto;
+	float:left;
+	width:240px;
+	margin:40px 0 0 20px;
+}
+.footer-link {
+	float:right;
+	margin:0 5px;
+	color:#aaaaaa;
+	cursor:pointer;
+}
+.footer-link:hover {
+	color:#666666;
+}
+
+.filters-filter-head {
+	margin-top:20px;
+	font-weight:700;
+	border-bottom:1px solid #f1f1f1;
+}
+.filter-wrapper {
+	padding: 8px 0;
+	border-bottom:1px solid #f1f1f1;
+}
+
+.filters-filter-wrapper label {
+	float:left;
+}
+.filters-filter-wrapper input,select{
+	margin-top:5px;
+	//width:100%;
+	border:0px solid #f1f1f1;
+	border-top:1px solid #f1f1f1;
+	border-bottom:1px solid #f1f1f1;
+	line-height:25px;
+}
+
+.filter-wrapper:hover {
+	cursor:pointer;
+}
+.filter-wrapper:hover .filter-checkbox:before {
+	color:#aaaaaa;
+	content: attr(data-icon);
+	font-family: 'naveen-font';
+}
+.filter-wrapper:hover .filter-checkbox.active:before {
+	color:#aaaaaa;
+	content: attr(data-icon-alt);
+	font-family: 'naveen-font';
+}
+.filter-checkbox.active:before {
+	color: #333333;
+	content: attr(data-icon);
+	font-family: 'naveen-font';
+}
+.filter-checkbox {
+	border:1px solid #cbcbcb;
+	position:relative;
+	display:block;
+	width:14px;
+	float:left;
+	height:14px;
+	font-size:10px;
+	padding-top:0px;
+	text-align:center;
+	margin-right:10px;
+	border-radius:3px;
+	zoom:1;
+}
+.filter-checkbox-text{
+	width:100%;
+}
+
+#map-content {
+	position:absolute;
+	width:100%;
+	top:90px;
+	bottom:0;
+}
+
+.invites-wrapper::-webkit-scrollbar{
+	width:10px;
+	background-color:#fafafa;
+} 
+.invites-wrapper::-webkit-scrollbar-thumb{
+	background-color:#aaaaaa;
+	border-radius:0px;
+	border:1px solid #aaaaaa;
+}
+.invites-wrapper::-webkit-scrollbar-thumb:hover{
+//	background-color:#aaaaaa;
+//	border:1px solid #aaaaaa;
+}
+.invites-wrapper::-webkit-scrollbar-thumb:active{
+//background-color:#A6393D;
+//border:1px solid #333333;
+} 
+
+.invites-wrapper {
+    position:absolute;
+	bottom:0;
+	width:100%;
+    overflow-x:hidden;
+    overflow-y:auto;
+	box-sizing:border-box;
+	padding:0px 0px 0px 0px;
+}
+.invite-box-actions-area {
+	position:absolute;
+	width:640px;
+	height:210px;
+	display:none;
+}
+
+.invite-box-actions-mask {
+	margin-top:160px;
+	background:#ee6150;
+	width:100%;
+	height:50px;
+	opacity:0.9;
+}
+
+.invite-box-actions-wrapper {
+	position:absolute;
+	top:0;
+	margin-top:160px;
+	width:100%;
+	height:50px;
+}
+
+
+.invite-box-actions-button {
+	float:left;
+	width:auto;
+	line-height:50px;
+	height:50px;
+	padding:0 20px;
+	font-size:16px;
+	color:white;
+}
+
+.invite-box-actions-button:hover {
+	background:#ee6150;
+	cursor:pointer;
+}
+.invite-box:hover .invite-box-actions-area{
+	display:block;
+}
+
+.invite-box:hover {
+	//border:1px solid gray;
+}
+
+.invite-dp-photos {
+	font-size:11px;
+	float:right;
+	margin-right:5px;
+	margin-top:0px;
+	color:#aaaaaa;
+    -webkit-transition-property: color; /* Safari */
+    -webkit-transition-duration: .2s; /* Safari */
+    transition-property: color;
+    transition-duration: .2s;
+}
+.invite-dp-photos:hover{
+	color:#333333;
+	cursor:pointer;
+}
+.invite-dp img{
+	height:128px;
+	width:128px;
+	margin:5px;
+}
+
+.invite-content {
+	float:left;
+	width:350px;
+	padding:0 10px;
+}
+.invite-content-rating {
+	width:45px;
+	height:36px;
+	position:absolute;
+	right:0px;
+	margin-right:20px;
+	text-align:center;
+	line-height:36px;
+	font-size:16px;
+	color:white;
+	background:rgb(50,150,50);
+	border-radius:3px;
+}
+.invite-content-rating.excellent {
+	background:#3f7e00;
+}
+.invite-content-rating.verygood {
+	background:#5ba829;
+}
+.invite-content-rating.good {
+	background:#9acd32;
+}
+.invite-content-rating.average{
+	background:#ffba00;
+}
+.invite-content-rating.poor {
+	background:#ff7800;
+}
+.invite-content-userstats {
+	width:300px;
+	height:36px;
+	position:absolute;
+	right:0px;
+	margin-right:15px;
+	text-align:right;
+	line-height:12px;
+	font-size:12px;
+	color:#888888;
+}
+
+.invite-content-userstats span{
+    -webkit-transition-property: color; /* Safari */
+    -webkit-transition-duration: .2s; /* Safari */
+    transition-property: color;
+    transition-duration: .2s;
+}
+.invite-content-userstats span:hover{
+	color:#333333;
+	cursor:pointer;
+}
+
+.invite-icons-box {
+	background: #ee6150;
+	width: 0px;
+	height:100%;
+	float:left;
+}
+
+.invite-content-top {
+	height:23px;
+}
+.invite-content-userdetails{
+	height:20px;
+}
+.invite-content-userdetails div{
+	float:left;
+}
+
+.invite-content-userdetails-location{
+	background:url(images/location.png) no-repeat;
+	margin:-5px 0 0 5px;
+	width:20px;
+	height:24px;
+	float:left;
+}
+
+.invite-content-desc {
+	//background:url(images/left_quote-128.png) no-repeat left top;
+	padding: 6px 0px;
+	font-style:italic;
+	line-height:16px;
+}
+.invite-content-desc-alt{
+	background:url(images/right_quote-128.png) no-repeat right bottom;
+	line-height:17px;
+}
+.invite-content-age{
+	font-size:13px;
+	float:left;
+	margin-left:10px;
+	height:20px;
+	line-height:20px;
+}
+
+.invite-content-opento {
+	margin-top:5px;
+	line-height:20px;
+	height:20px;
+}
+.invite-content-opento-head {
+	float:left;
+	color:#666666;
+	margin-right:3px;
+	//font-weight:600;
+}
+.invite-content-opento-value {
+	float:left;
+	margin-left: 2px;
+	padding:2px 10px;
+	border-radius: 10px;
+	line-height:15px;
+	background: #f2f2f2;
+}
+
+.invite-content-openfor {
+	margin-top:5px;
+	line-height:20px;
+	height:20px;
+}
+.invite-content-openfor-head {
+	margin-right:3px;
+	float:left;
+	color:#666666;
+	//font-weight:600;
+}
+.invite-content-openfor-value {
+	float:left;
+	margin-left: 2px;
+	padding:2px 10px;
+	border-radius: 10px;
+	line-height:15px;
+	color:#fefefe;
+	background: #ee6150;
+	color:#333333;
+	background: #f2f2f2;
+}
+.invite-content-actions-wrapper {
+		margin-top:10px;
+}
+.invite-content-action {
+	float:left;
+	margin-right: 6px;
+	padding:0px 10px;
+	border-radius: 8px;
+	font-size:13px;
+	line-height:22px;
+	height:22px;
+	color:#aaaaaa;
+	border:1px solid #aaaaaa;
+    -webkit-transition-property: color; /* Safari */
+    -webkit-transition-duration: .2s; /* Safari */
+    transition-property: color;
+    transition-duration: .2s;
+}
+.invite-content-action:hover {
+	color:#888888;
+	cursor:pointer;
+}
+
+#map-wrapper {
+	width: 100%;
+	height: 100%;
+	top: 0px;
+	bottom: 0;
+	overflow: hidden;
+	transform: translateZ(0px);
+}
+
+.detail-box-content::-webkit-scrollbar{
+	width:10px;
+	background-color:#fafafa;
+} 
+.detail-box-content::-webkit-scrollbar-thumb{
+	background-color:#aaaaaa;
+	border-radius:0px;
+	border:1px solid #aaaaaa;
+}
+.detail-box-content::-webkit-scrollbar-thumb:hover{
+//	background-color:#aaaaaa;
+//	border:1px solid #aaaaaa;
+}
+.detail-box-content::-webkit-scrollbar-thumb:active{
+//background-color:#A6393D;
+//border:1px solid #333333;
+} 
+
+.detail-box-loading-wrapper {
+	bottom:0;
+	width:500px;
+	height:100%;
+	position:fixed;
+	display:none;
+	z-index:99;
+	left:0;
+	background: url(images/ajax_loader.gif) no-repeat center center;
+}
+.detail-box-wrapper {
+	bottom:0;
+	width:500px;
+	height:100%;
+	position:fixed;
+	z-index:1;
+	left:-500px;
+    -webkit-transition-property: left; /* Safari */
+    -webkit-transition-duration: 0.5s; /* Safari */
+    transition-property: left;
+    transition-duration: 0.5s;
+}
+.detail-box-content-wrapper {
+	width:450px;
+	height:100%;
+	float:left;
+}
+.detail-box-content {
+	//border-right:1px solid #fafafa;
+	//padding-right:1px;
+	width:450px;
+    position:absolute;
+	background:#fff;
+    bottom:0px;
+    top:40px;
+    overflow-x:hidden;
+    overflow-y:auto;
+    -moz-box-shadow: 2px 2px 18px #333333;
+    -webkit-box-shadow: 2px 2px 18px #333333;
+    box-shadow: 2px 2px 18px #333333;
+}
+
+.details-x {
+	box-sizing: border-box;
+	width:100%;
+	padding:20px 10px;
+	height:auto;
+	clear:both;
+}
+
+.detail-box-close-btn{
+	color:#efefef;
+	text-align:center;
+	font-size:24px;
+	width:40px;
+	height:40px;
+	line-height:40px;
+	position:fixed;
+	margin-top:40px;
+	margin-left:452px;
+	z-index:99999;
+	background:#444444;
+    -moz-box-shadow: 2px 2px 10px #aaaaaa;
+    -webkit-box-shadow: 2px 2px 10px #aaaaaa;
+    box-shadow: 2px 2px 10px #aaaaaa;
+    -webkit-transition-property: color, font-size; /* Safari */
+    -webkit-transition-duration: .2s; /* Safari */
+    transition-property: color, font-size;
+    transition-duration: .2s;
+}
+.detail-box-close-btn:hover{
+	cursor:pointer;
+	color:#fefefe;
+}
+
+.detail-box-top-fixed {
+	position:fixed;
+	top:-135px;
+
+	overflow:hidden;
+	display:block;
+	width:440px;
+	z-index:2;
+	height:350px;
+}
+
+.detail-box-content-photo.visible{
+	-webkit-transform: translate(0px, 0px) translateZ(0px); 
+	-moz-transform: translate(0px, 0px) translateZ(0px);  
+	-ms-transform: translate(0px, 0px) translateZ(0px);  
+	transform: translate(0px, 0px) translateZ(0px);
+}
+.detail-box-content-photos{	
+	height:300px;
+	text-align:center;
+	background:#333333;
+	overflow:hidden;
+	display:block;
+	width:440px;
+	z-index:2;
+}
+.detail-box-content-photos:hover .detail-box-content-photos-prev {
+	opacity:0.2;
+}
+.detail-box-content-photos:hover .detail-box-content-photos-next {
+	opacity:0.2;
+}
+.detail-box-content-verified{
+	background:#27ae60;
+	padding: 3px 5px;
+	border-radius:3px;
+	font-size:11px;
+	text-shadow:none;
+	margin:2px 0 0 6px;
+	float:left;
+	-moz-box-shadow: 1px 1px 3px #666666;
+    -webkit-box-shadow: 1px 1px 3px #666666;
+    box-shadow:  1px 1px 3px #666666;
+}
+.detail-box-content-name{
+	font-size:20px;
+	float:left;
+}
+.detail-box-content-photos-next {
+	width:60px;
+	height:300px;
+	display:block;
+	position:absolute;
+	right:0;
+	z-index:2;
+	font-size:50px;
+	text-align:center;
+	line-height:300px;
+	opacity:0;
+    -webkit-transition-property: opacity;
+    -webkit-transition-duration: .2s;
+    transition-property: opacity;
+    transition-duration: .2s;
+	color:#fff;
+}
+.detail-box-content-photos-prev {
+	width:60px;
+	height:300px;
+	display:block;
+	position:absolute;
+	z-index:2;
+	font-size:50px;
+	text-align:center;
+	line-height:300px;
+	opacity:0;
+    -webkit-transition-property: opacity;
+    -webkit-transition-duration: .2s;
+    transition-property: opacity;
+    transition-duration: .2s;
+	color:#fff;
+}
+.detail-box-content-photos-prev:hover, .detail-box-content-photos-next:hover {
+	cursor:pointer;
+	opacity:0.7 !important;
+}
+.detail-box-content-photo-text {
+	width:100%;
+	position:absolute;
+	top:240px;
+	left:0;
+	font-size:12px;
+	color:#fff;
+    -moz-text-shadow: 2px 2px 2px #333333;
+    -webkit-text-shadow: 2px 2px 2px #333333;
+    text-shadow: 2px 2px 2px #333333;
+}
+.detail-box-content-photo-text-left {
+	width:300px;
+	float:left;
+	text-align:left;
+	padding-left:10px;
+	padding-top:15px;
+	line-height:1.28;
+}
+.detail-box-content-photo-text-right {
+	width:80px;
+	float:right;
+	text-align:right;
+	padding-right:10px;
+	padding-top:40px;
+}
+.detail-box-content-photo{
+    width: 440px;
+    height: 300px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+	
+	position:absolute;
+	float:left;
+	-webkit-transition: 300ms;
+	-webkit-transform: translate(445px, 0px) translateZ(0px); 
+	-moz-transform: translate(445px, 0px) translateZ(0px);
+	-moz-transition: 300ms;
+	-ms-transform: translate(445px, 0px) translateZ(0px);
+	-ms-transition: 300ms;
+	transform: translate(445px, 0px) translateZ(0px);
+	transition: 300ms;
+}
+.detail-box-content-tabs-wrapper{
+	width:100%;
+	box-sizing: border-box;
+	height:34px;
+	border-top: 1px solid #fafafa;
+	text-align: justify;
+	background:#fff;
+    -moz-box-shadow: 0px 3px 10px #dedede;
+    -webkit-box-shadow: 0px 3px 10px #dedede;
+    box-shadow: 0px 3px 10px #dedede;
+}
+.detail-box-content-tabs-tab{
+	border-right: 1px solid rgba(196,206,223,0.4);
+	line-height:34px;
+	height:34px;
+	width:33%;
+    display:inline-block;
+	float:left;
+	text-align:center;
+	font-size:12px;
+	border-bottom: 1px solid #dddddd;
+    -webkit-transition-property: border, background;
+    -webkit-transition-duration: .2s;
+    transition-property: border, background;
+    transition-duration: .2s;
+}
+.detail-box-content-tabs-tab.active{
+	//border-bottom: 2px solid rgb(51, 136, 238);
+	border-bottom: 2px solid #bc212d;
+}
+.detail-box-content-tabs-tab:hover { 
+	background:#fafafa;
+	cursor:pointer;
+}
+a {
+	text-decoration:none;
+	color:#333333;
+}
+.action {
+	cursor:pointer;
+}
+
+.action-btn {
+	line-height:2;
+	padding:0 10px;
+    -webkit-transition-property: box-shadow;
+    -webkit-transition-duration: .2s;
+    transition-property: box-shadow;
+    transition-duration: .2s;
+}
+.action-btn:hover {
+	cursor:pointer;
+    -moz-box-shadow: 3px 3px 15px #eeeeee;
+    -webkit-box-shadow: 3px 3px 15px #eeeeee;
+    box-shadow:  3px 3px 15px #eeeeee;
+}
+
+
+#wrapper {
+    width:100%;
+    height:100%;
+    padding:0;
+    margin:0;
+	overflow-y:hidden;
+}
+#left {
+    position:absolute;
+    left:0;
+    width:250px;
+    height:100%;
+}
+
+#center {
+    height:100%;
+    margin: 0 555px 0 0px;
+}
+
+#right {
+    position:absolute;
+    right:0;
+    top:90px;
+	bottom:0;
+    width:555px;
+	background: #222222;
+	background: #fff;
+    -moz-box-shadow: -1px 3px 3px #585858;
+    -webkit-box-shadow: -1px 3px 3px #585858;
+    box-shadow:  -1px 3px 3px #585858;
+	border:0;	
+}
+
+.separator-95{
+	border-bottom:1px solid #eeeeee;
+	height:10px;
+	margin:10px 10px 0px 10px;
+	clear:both;
+}
+.details-x-invite-offering {
+	width:50%;
+	float:left;
+	position:relative;
+	padding:5px 10px;
+	box-sizing: border-box;
+}
+.details-x-invite-offering-head{
+	font-size:16px;
+	//font-weight:600;
+}
+.details-x-invite-offering-desc{
+	line-height:15px;
+}
+.space-20 {
+	height:20px;
+	width:100%;
+	clear:both;
+}
+.details-x-invite-keyvalue-full {
+	width:100%;
+	float:left;
+	position:relative;
+	padding:0 10px;
+	height:40px;
+	line-height:40px;
+	box-sizing: border-box;
+	font-size:14px;
+}
+.details-x-invite-keyvalue {
+	width:50%;
+	float:left;
+	position:relative;
+	padding:0 10px;
+	height:40px;
+	line-height:40px;
+	box-sizing: border-box;
+	font-size:14px;
+}
+.details-x-invite-keyvalue-inner {
+	height:40px;
+	line-height:40px;
+	border-bottom:1px solid #eeeeee;
+}
+.details-x-invite-key {
+	float:left;
+	color:#aaaaaa;
+}
+.details-x-invite-value {
+	float:right;
+	text-align:right;
+}
+.details-x-subhead {
+	font-size:16px;
+	padding-left:10px;
+	clear:both;
+	line-height:30px;
+}
+.details-x-head {
+	font-size:18px;
+	padding:0 0 0 10px;
+	height:35px;
+	margin-bottom:10px;
+	border-bottom:1px solid #dddddd;
+}
+
+.details-box-action-container {
+	height:40px;
+	width:440px;
+	bottom:0;
+	left:0;
+	position:absolute;
+	box-sizing: border-box;
+    -moz-box-shadow: 0px -3px 10px #dedede;
+    -webkit-box-shadow: 0px -3px 10px #dedede;
+    box-shadow:  0px -3px 10px #dedede;
+	z-index:5;
+}
+.details-box-action:hover {
+	color:#ffffff;
+}
+.details-box-action {
+	width:220px;
+	line-height:40px;
+	height:40px;
+	float:left;
+	font-size:13px;
+	text-align:center;
+	border:1px solid #6c111d;
+	border-left:0;
+	background: #bc212d;
+	box-sizing: border-box;
+	color:#eeeeee;
+    -moz-text-shadow: 2px 2px 4px #bc212d;
+    -webkit-text-shadow: 2px 2px 2px #bc212d;
+    text-shadow: 2px 2px 4px #6c111d;
+    -webkit-transition-property: color;
+    -webkit-transition-duration: .3s;
+    transition-property: color;
+    transition-duration: .3s;	
+}
+.details-box-sub-actions-container {
+	display:none;
+	padding:5px 0px;
+	position:fixed;
+	bottom:40px;
+	background: #bc212d;
+    -moz-box-shadow: 3px 3px 10px #555555;
+    -webkit-box-shadow: 3px 3px 10px #555555;
+    box-shadow:  3px 3px 10px #555555;
+}
+.details-box-sub-action {
+	padding:0 10px;
+	font-size:13px;
+	line-height:40px;
+	height:40px;
+	text-align:left;
+	color:#eeeeee;
+    -webkit-transition-property: color, background;
+    -webkit-transition-duration: .2s;
+    transition-property: color, background;
+    transition-duration: .2s;	
+}
+.details-box-sub-action:hover {
+	background:#333333;
+	color:#ffffff;
+}
+.details-box-message-container {
+	width:440px;
+	height:160px;
+	background:#fdfdfd;
+	bottom:40px;
+	position:absolute;
+	font-size:16px;
+	padding:0 20px;
+	box-sizing: border-box;
+    -moz-box-shadow: -1px -5px 15px #aaaaaa;
+    -webkit-box-shadow: -1px -5px 15px #aaaaaa;
+    box-shadow:  -1px -5px 15px #aaaaaa;
+    -webkit-transition-property: bottom;
+    -webkit-transition-duration: 300ms;
+    transition-property: bottom;
+    transition-duration: 300ms;	
+	z-index:4;
+}
+.details-box-request-container {
+	width:440px;
+	height:240px;
+	background:#fdfdfd;
+	bottom:40px;
+	position:absolute;
+	font-size:16px;
+	padding:0 20px;
+	box-sizing: border-box;
+    -moz-box-shadow: -1px -5px 15px #aaaaaa;
+    -webkit-box-shadow: -1px -5px 15px #aaaaaa;
+    box-shadow:  -1px -5px 15px #aaaaaa;
+    -webkit-transition-property: bottom;
+    -webkit-transition-duration: 300ms;
+    transition-property: bottom;
+    transition-duration: 300ms;	
+	z-index:4;
+}
+.details-box-request-close-btn {
+	position:absolute; 
+	right:0; 
+	width:30px; 
+	height:30px; 
+	line-height:30px; 
+	font-size:20px; 
+	text-align:center;
+    -webkit-transition-property: background;
+    -webkit-transition-duration: 200ms;
+    transition-property: background;
+    transition-duration: 200ms;	
+	z-index:4;
+}
+.details-box-request-close-btn:hover {
+	cursor: pointer;
+	background:#efefef; 
+}
+.details-box-request-field-datetime {
+	line-height:30px;
+	height:30px;
+	margin-top:10px;
+	margin-bottom:20px;
+	border-bottom:1px solid #efefef;
+}
+.details-box-request-field-datetime-input {
+	width:180px;
+	line-height:30px;
+	height:30px;
+	float:right;
+	text-align:right;
+}
+.details-box-request-field-datetime-input:hover {
+	cursor:pointer;
+}
+.details-box-request-field-guests {
+	line-height:30px;
+	height:30px;
+	margin-top:40px;
+	margin-bottom:10px;
+	border-bottom:1px solid #efefef;
+}
+.details-box-request-field-guests-btn{
+	width:30px;
+	line-height:28px;
+	height:28px;
+	text-align:center;
+	background:#fafafa;
+	font-size:22px;
+	float:right;
+}
+.details-box-request-field-guests-btn:hover {
+	cursor:pointer;
+	background:#f5f5f5;
+}
+.details-box-request-field-guests-btn:active {
+}
+
+.details-box-request-field-guests-input{
+	width:30px;
+	line-height:28px;
+	height:28px;
+	text-align:center;
+	font-size:18px;
+	float:right;
+}
+.details-box-request-field-why{
+	height:55px;
+	margin-top:15px;
+}
+.details-box-request-field-why textarea{
+	box-sizing: border-box;
+	height:55px;
+	width:100%;
+}
+
+.calendar-container {
+	width:100%;
+	height:100%;
+	box-sizing: border-box;
+	background:#fefefe;
+	opacity:0.9;
+	top:0;
+	left:0;
+	position:absolute;
+}
+.calendar-parent {
+	width:100%;
+	height:100%;
+	box-sizing: border-box;
+	top:0;
+	left:0;
+	position:absolute;
+}
+.calendar-content {
+	width:246px;
+	height:100%;
+	box-sizing: border-box;
+	float:left;
+	padding: 5px 0;
+}
+.calendar-control-prev-month, .calendar-control-next-month {
+	width:97px;
+	height:100%;
+	line-height:4.5;
+	font-size:50px;
+	box-sizing: border-box;
+	float:left;
+	text-align:center;
+	color:#aaaaaa;
+    -webkit-transition-property: color;
+    -webkit-transition-duration: 200ms;
+    transition-property: color;
+    transition-duration: 200ms;	
+}
+.calendar-control-prev-month:hover, .calendar-control-next-month:hover{
+	cursor:pointer;
+	color:#555555;
+}
+.calendar-month-header {
+	width:100%;
+	height:20px;
+	margin-top:5px;
+	clear:both;
+	text-align:center;
+	font-weight:800;
+	font-size:16px;
+}
+.calendar-day-block {
+	width:35px;
+	height:25px;
+	line-height:25px;
+	text-align:center;
+	float:left;
+	margin-top:10px;
+	font-size:12px;
+}
+.calendar-nodate-block {
+	width:35px;
+	height:28px;
+	line-height:28px;
+	text-align:center;
+	float:left;
+}
+.calendar-date-block {
+	width:35px;
+	height:28px;
+	line-height:28px;
+	text-align:center;
+	float:left;
+    -webkit-transition-property: background;
+    -webkit-transition-duration: 200ms;
+    transition-property: background;
+    transition-duration: 200ms;	
+	font-size:16px;
+}
+.calendar-date-block:hover {
+	background: #efefef;
+	cursor:pointer;
+}
+.calendar-date-block.selected {
+	font-weight:700;
+}
+.calendar-week-block{
+	width:100%;
+	clear:both;
+}
+
+.details-x-feedback img{
+	width:75px;
+	height:75px;
+	border-radius:75px;
+	float:left;
+}
+.details-x-feedback-content-time {
+	position:absolute;
+	right:3px;
+	bottom:-13px;
+	font-size:10px;
+	color:#888;
+}
+.details-x-feedback-content-arrow {
+	position:absolute;
+	left:-12px;
+	font-size:22px;
+	top:10px;
+	color:#f5f5f5;
+}
+.details-x-feedback-content p{
+	font-style:italic;
+}
+.details-x-feedback-content {
+	float:right;
+	position:relative;
+	width:270px;
+	padding:0px 20px;
+	border-radius:3px;
+	background:#f5f5f5;
+}
+.details-x-feedback {
+	width:100%;
+	margin-top:15px;
+	padding:0 10px;
+	box-sizing:border-box;
+}
+.clearfix:after {
+	visibility:hidden;
+	display:block;
+	font-size:0;
+	content: ".";
+	clear:both;
+	height:0;
+	line-height:
+}
+.clearfix {
+	display: inline-block;
+}
+
+.header-filter-input{
+	background-color: #fff;
+	border-radius: 2px;
+	border: 0px;
+	border: 1px solid transparent;
+	height: 28px;
+	padding-left: 28px;
+	padding-right: 28px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	width:300px;	
+}
+
+</style>
+</head>
+
+<body>
+
+
+<div id="detail-box-loading" class="detail-box-loading-wrapper"></div>
+<div id="detail-box" class="detail-box-wrapper">
+	<div id="detail-box-main" class="detail-box-content-wrapper">
+		<div style="height:40px;"></div>
+		<div id="detail-box-content" class="detail-box-content">
+		<!-- detail fixed -->
+		<div id="detail-box-top" style="width:440px;outline: none;" tabindex="999">
+			<div id="detail-box-content-photo" class="detail-box-content-photos">
+				<div id="dbx-photos">
+					<div class="detail-box-content-photo visible" data-index="0" style="background-image:URL(cdn/photos/pooja_pics/0.jpg);"></div>
+					<div class="detail-box-content-photo" data-index="1" style="background-image:URL(cdn/photos/pooja_pics/9.jpg);"></div>
+				</div>
+				<div class="detail-box-content-photos-prev icon" onclick="detailBox.prev()" data-icon="&#xe002;"></div>
+				<div class="detail-box-content-photos-next icon" onclick="detailBox.next()" data-icon="&#xe003;"></div>
+				<div class="detail-box-content-photo-text">
+					<div class="detail-box-content-photo-text-left">
+						<div style="clear:both;width:100%;">
+						<span class="detail-box-content-name" id="dbx-name">Pooja Sharma</span><span class="detail-box-content-verified" id="dbx-verified">VERIFIED</span>
+						</div>
+						<div style="float:none;clear:both;font-size:12px;" id="dbx-sexagelocation">Female | 25 yrs | Gurgaon, India</div>
+					</div>
+					<div class="detail-box-content-photo-text-right" id="detail-box-gallery-counter"></div>
+				</div>
+			</div>
+			<div class="detail-box-content-tabs-wrapper">
+				<div id="detail-box-tab-invite" class="detail-box-content-tabs-tab">INVITE</div>
+				<div id="detail-box-tab-profile" class="detail-box-content-tabs-tab">POOJA</div>
+				<div id="detail-box-tab-history" class="detail-box-content-tabs-tab">POOJA ON INVITO</div>
+			</div>
+			</div> 
+			<!-- /detail fixed -->
+			
+			<div id="detail-box-content-invite" class="details-x">
+
+				<div class="details-x-head">INVITE DETAILS</div>
+
+				<div class="details-x-invite-offering-wrapper" id="dbx-offering">
+					<div class="details-x-invite-offering">
+						<div class="details-x-invite-offering-head">Dinner</div>
+						<div class="details-x-invite-offering-desc">OKish penne in white sauce and vegetable fried rice.</div>
+					</div>
+					<div class="details-x-invite-offering">
+						<div class="details-x-invite-offering-head">Music Performance</div>
+						<div class="details-x-invite-offering-desc">I play guitar, keyboard and will sing couple of pop favourites (Maroon 5, Passenger, Coldplay...)</div>
+					</div>
+					<div class="details-x-invite-offering">
+						<div class="details-x-invite-offering-head">Karaoke</div>
+						<div class="details-x-invite-offering-desc">Sing along :)</div>
+					</div>
+				</div>
+				
+				<div class="separator-95"></div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Requests Received</div>
+						<div class="details-x-invite-value" id="dbx-requestsReceived">24</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Accepted</div>
+						<div class="details-x-invite-value" id="dbx-requestsAccepted">5</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Posted</div>
+						<div class="details-x-invite-value" id="dbx-postedDateTime">2 months ago</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Last Attended</div>
+						<div class="details-x-invite-value" id="dbx-lastAttendedDateTime">6 days ago</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Preferred Day</div>
+						<div class="details-x-invite-value" id="dbx-preferredDay">Weekend</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Preferred Time</div>
+						<div class="details-x-invite-value" id="dbx-preferredTime">Evening</div>
+					</div>
+				</div>
+	
+				<div class="space-20"></div>
+				
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Max number of guests</div>
+						<div class="details-x-invite-value" id="dbx-maxGuestsAllowed">5</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Gender preference</div>
+						<div class="details-x-invite-value" id="dbx-preferredGender">None</div>
+					</div>
+				</div>
+
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Smoking Allowed</div>
+						<div class="details-x-invite-value" id="dbx-smokingAllowed">Yes</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Kids Allowed</div>
+						<div class="details-x-invite-value" id="dbx-kidsAllowed">No</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Pets Allowed</div>
+						<div class="details-x-invite-value" id="dbx-petsAllowed">Yes</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Overnight Stay</div>
+						<div class="details-x-invite-value" id="dbx-overnightStay">No</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="space-20"></div>
+
+			<div id="detail-box-content-profile" class="details-x">
+
+				<div class="details-x-head">ABOUT <span id="dbx-profileHead">POOJA</span></div>
+
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Phone Number Verified</div>
+						<div class="details-x-invite-value" id="dbx-phoneVerified">Yes</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Credit Card Verified</div>
+						<div class="details-x-invite-value" id="dbx-creditCardVerified">No</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Staying with</div>
+						<div class="details-x-invite-value" id="dbx-stayingWith">Alone</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Staying in</div>
+						<div class="details-x-invite-value" id="dbx-stayingIn">Rented Apartment</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue-full">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Work</div>
+						<div class="details-x-invite-value" id="dbx-workDetails">Assistant Manager, American Express</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue-full">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">College/School</div>
+						<div class="details-x-invite-value" id="dbx-schoolDetails">BE, MNIT, Jaipur</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue-full">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Music</div>
+						<div class="details-x-invite-value" id="dbx-music">Metal, Pop, Jazz</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue-full">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Movie</div>
+						<div class="details-x-invite-value" id="dbx-movie">Comedy, Documentary, Romance</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue-full">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Sports</div>
+						<div class="details-x-invite-value" id="dbx-sports">Football, Badminton, Chess</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue-full">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Food</div>
+						<div class="details-x-invite-value" id="dbx-food">Italian, Chinese, Junk Food</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue-full">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Interests</div>
+						<div class="details-x-invite-value" id="dbx-interests">Guitar, Theatre, Travel</div>
+					</div>
+				</div>
+
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Smokes</div>
+						<div class="details-x-invite-value" id="dbx-smokes">Yes</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Drinks</div>
+						<div class="details-x-invite-value" id="dbx-drinks">Yes</div>
+					</div>
+				</div>
+				
+			</div>
+
+			<div class="space-20"></div>
+
+			<div id="detail-box-content-history" class="details-x">
+
+				<div class="details-x-head">ACTIVITY/FEEDBACKS</div>
+
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Invites Hosted</div>
+						<div class="details-x-invite-value" id="dbx-invitesHosted">1</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Attended</div>
+						<div class="details-x-invite-value" id="dbx-invitesAttended">5</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Feedbacks</div>
+						<div class="details-x-invite-value" id="dbx-feedbackCount">8</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key">Last Login</div>
+						<div class="details-x-invite-value" id="dbx-lastLogin">30 mins ago</div>
+					</div>
+				</div>
+
+				<div class="space-20"></div>
+
+				<div id="dbx-feedbacks">
+					<div class="details-x-feedback clearfix">
+						<img src="images/batar.png">
+						<div class="details-x-feedback-content">
+							<div class="details-x-feedback-content-arrow icon" data-icon="&#xe002;"></div>
+							<p>Some text here and some shit</p>
+							<div class="details-x-feedback-content-time">3 months ago</div>
+						</div>
+					</div>
+					<div class="details-x-feedback clearfix">
+						<img src="images/anki.png">
+						<div class="details-x-feedback-content">
+							<div class="details-x-feedback-content-arrow icon" data-icon="&#xe002;"></div>
+							<p>Don't forget to subscribe our blogDon't forget to subscribe our blogDon't forget to subscribe our blogDon't forget to subscribe our blogDon't forget to subscribe our blogDon't forget to subscribe our blog!</p>
+							<div class="details-x-feedback-content-time">10 months ago</div>
+						</div>
+					</div>
+					<div class="details-x-feedback clearfix">
+						<img src="images/pooja.png">
+						<div class="details-x-feedback-content">
+							<div class="details-x-feedback-content-arrow icon" data-icon="&#xe002;"></div>
+							<p>Don't forget to subscribe our blog!</p>
+							<div class="details-x-feedback-content-time">3 months ago</div>
+						</div>
+					</div>
+				</div>
+				
+
+			</div>
+			<div class="space-20"></div>
+			<div class="space-20"></div>
+
+		</div>
+		
+		<!-- Actions -->
+		<div class="details-box-action-container">
+			<div class="details-box-action action" style="width:200px" onclick="detailBox.showRequestBox()">SEND REQUEST</div>
+			<div class="details-box-action action" style="width:200px" onclick="detailBox.showMessageBox()">MESSAGE</div>
+			<div class="details-box-action icon action" onclick="detailBox.showAltMenu()" data-icon="&#xe011;" style="border-right:0;width:40px;font-size:22px;">
+				<div id="details-box-sub-actions" class="details-box-sub-actions-container" style="z-index:6;">
+					<div class="details-box-sub-action">ADD AS FRIEND</div>
+ 					<div class="details-box-sub-action">REPORT/BLOCK</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Actions -->
+		<!-- SEND REQUEST BOX -->		
+		<div id="details-box-send-request" class="details-box-request-container">
+			<div class="details-box-request-close-btn icon" onclick="detailBox.hideRequestBox()" data-icon="&#xe00a;"></div>
+			
+			<div class="details-box-request-field-guests">
+				<div class="left" style=""># of Guests (including you)</div>
+				<div class="details-box-request-field-guests-btn" style="" onclick="detailBox.requestBoxIncreaseGuest()">+</div>
+				<div id ="details-box-request-field-guests" class="details-box-request-field-guests-input" style=""></div>
+				<div class="details-box-request-field-guests-btn" style="" onclick="detailBox.requestBoxDecreaseGuest()">-</div>
+			</div>
+			<div class="details-box-request-field-datetime" style="">
+				<div class="left" style="">Visiting On</div>
+				<div class="details-box-request-field-datetime-input left" style="" onclick="cal.select(this)">Click to select a date</div>
+<!-- 				<div class="left" style="margin-left:47px;">Around</div>
+				<div class="left" style=""><input /></div>
+ -->			</div>
+			<div class="details-box-request-field-why" style="clear:both">
+				<textarea placeholder="Tell Pooja why you'd be a good company"></textarea>
+			</div>
+			<div class="invite-content-action" style="margin-top:15px;float:right;margin-right:0px;">SEND REQUEST</div>
+		</div>
+		<!-- /SEND REQUEST BOX -->		
+		<!-- MESSAGE BOX -->		
+		<div id="details-box-message" class="details-box-message-container">
+			<div class="details-box-request-close-btn icon" onclick="detailBox.hideMessageBox()" data-icon="&#xe00a;"></div>
+			
+			<div class="left" style="clear:both;margin:15px 0 15px 0;">Send a message to Pooja</div>
+			<div class="details-box-request-field-why" style="clear:both;">
+				<textarea placeholder="Be nice to her :)"></textarea>
+			</div>
+			<div class="invite-content-action" style="margin-top:15px;float:right;margin-right:0px;">SEND MESSAGE</div>
+		</div>
+		<!-- /MESSAGE BOX -->		
+
+	</div>
+	<div class="detail-box-close-btn icon" data-icon="&#xe00a;" onclick="detailBox.close();"></div>
+</div>
+
+
+<header class="header-box">
+	<div class="header-logo"></div>
+	<div class="header-content">
+		<div class="header-content-logo">SECONDHAND <b style="color:#eeeeee;font-size:12px;font-weight:400">beta</b></div>
+
+		<div class="left" style="padding-top:6px;position:relative;width:300px;">
+			<span class="icons" style="position:absolute;left:6px;top:0px;color:#555;z-index:1;font-size:16px;">
+				<i class="marker-icon icon" style="display: inline; width:20px;height:20px;font-style: normal;" data-icon="&#xe006;"></i>
+			</span>
+			<span>
+				<input class="header-filter-input left" id="header-select-locality" style="background:#fdfdfd;" placeholder="Search by locality or landmark" autocomplete="off" spellcheck="false" dir="auto">
+			</span>
+			<span class="icons" style="position:absolute;right:6px;top:0px;color:#555;z-index:1;font-size:16px;">
+				<i class="marker-icon icon" style="display: inline; width:20px;height:20px;font-style: normal;" data-icon="&#xe009;"></i>
+			</span>
+		</div>
+
+		<div class="left" style="padding-top:6px;position:relative;width:300px;margin-left:20px;">
+			<span class="icons" style="position:absolute;left:6px;top:0px;color:#555;z-index:1;font-size:16px;">
+				<i class="marker-icon icon" style="display: inline; width:20px;height:20px;font-style: normal;" data-icon="&#xe011;"></i>
+			</span>
+			<span>
+				<input class="header-filter-input left" style="background:#fdfdfd;" placeholder="Looking for..." autocomplete="off" spellcheck="false" dir="auto">
+			</span>
+			<span class="icons" style="position:absolute;right:6px;top:0px;color:#555;z-index:1;font-size:16px;">
+				<i class="marker-icon icon" style="display: inline; width:20px;height:20px;font-style: normal;" data-icon="&#xe009;"></i>
+			</span>
+		</div>
+		
+		<div class="header-nav-wrapper">
+			<div class="header-nav-menu">SELL ON SECONDHAND</div>
+			<div class="header-nav-menu">LOGIN</div>
+			<div class="header-nav-menu">MENU</div>
+		</div>
+	</div>
+</header>
+
+<div class="filter-box" style="width:100%;height:50px;position:absolute;top:40px;z-index:999;line-height:50px;color:#fff;">
+
+	<div class="left" style="margin-left:10px;">Filters </div>
+
+	<div class="left" style="display:block;height:50px;position:relative;margin-left:10px;min-width:120px;">
+		<div class="" style="display:block;margin-top:10px;height:30px;position:relative;background:#fff;cursor:pointer;border-radius:2px;">
+			<div class="left" style="line-height:30px;color:#555;padding:0 30px 0 10px;">Budget</div>
+			<div class="icon" style="position:absolute;right:10px;top:0px;color:#555;font-size:20px;line-height:30px;" data-icon="&#xe00f;"></div>
+		</div>
+	</div>
+	<div class="left" style="display:block;height:50px;position:relative;margin-left:10px;min-width:120px;">
+		<div class="" style="display:block;margin-top:10px;height:30px;position:relative;background:#fff;cursor:pointer;border-radius:2px;">
+			<div class="left" style="line-height:30px;color:#555;padding:0 30px 0 10px;">Used for</div>
+			<div class="icon" style="position:absolute;right:10px;top:0px;color:#555;font-size:20px;line-height:30px;" data-icon="&#xe00f;"></div>
+		</div>
+	</div>
+	<div class="left" style="display:block;height:50px;position:relative;margin-left:10px;min-width:120px;">
+		<div class="" style="display:block;margin-top:10px;height:30px;position:relative;background:#fff;cursor:pointer;border-radius:2px;">
+			<div class="left" style="line-height:30px;color:#555;padding:0 30px 0 10px;"></div>
+			<div class="icon" style="position:absolute;right:10px;top:0px;color:#555;font-size:20px;line-height:30px;" data-icon="&#xe00f;"></div>
+		</div>
+	</div>
+
+
+</div>
+
+<div id="wrapper">
+    <div id="center">
+		<div id="map-wrapper">
+			<div id="map-content"></div>
+		</div>
+	</div>
+
+    <div id="right">
+		<div class="tab-wrapper">
+			<div class="tab active left" id="main-list-tab"><b>120</b> Results within 100 kms</div>
+			<div class="tab left" id="short-list-tab"><b id="short-list-shortlisted-count">0</b> Shortlisted / <b id="short-list-contacted-count">0</b> Contacted</div>
+		</div>
+
+		<div class="invites-wrapper hidden" style="height:auto;width:100%;top:40px" id="short-list">
+		</div>
+
+		<div class="sort-wrapper" id="sort-wrapper">
+			<div class="text-bold"><b>Show</b></div>
+			<div class="sort" id="">Recent First</div>
+			<div class="sort" id="">Nearest First</div>
+			<div class="sort" id="">Low Price</div>
+			<div class="sort" id="">High Price</div>
+		</div>
+		
+		<div class="invites-wrapper" style="top:80px" id="main-list-wrapper">
+			<div class="height:auto;width:100%;" id="main-list">
+			<!-- list start -->
+			<!-- list end -->
+			</div>
+		</div>
+	</div>
+	
+	<!-- HTML TEMPLATES-->
+	<div id="TEMPLATE-LISTITEM" style="display:none">
+		<div class="list-item-main">
+			<div class="list-item-pic" style="background-image:url(./cdn/pic2.jpg)"></div>
+			<div class="list-item-content">
+				<div class="list-item-icons">
+					<div class="icon left" data-icon="&#xe00e;"></div>
+					<div class="icon left" data-icon="&#xe007;"></div>
+				</div>
+				<div class="list-item-title">Apple iPhone 5 (16 GB)</div>
+				<div class="list-item-location">5th Block. Koramangala</div>
+				<div style="margin-top:3px;width:100%;height:20px;">
+					<div class="list-item-location left">Used For <span style="color:#fff;border-radius:8px;padding:3px 10px;background:#27ae60;">2 years</span></div>
+					<div class="list-item-location left" style="margin-left:15px;">Condition <span style="color:#fff;border-radius:8px;padding:3px 10px;background:#27ae60;">Bad</span></div>
+				</div>
+				<div class="list-item-price clearfix">Rs 15,000</div>
+				<div class="list-item-time"><span>2 mins ago</span></div>
+			</div>
+		</div>
+	</div>
+	<!-- /HTML TEMPLATES-->
+	
+</div>
+
+</body>
+<script>
+	init();
+	//google.maps.event.addDomListener(window, 'load', initialize());
+	//cal = new nCalendarClosure('details-box-send-request');
+	//detailBox.init();
+	document.addEventListener("keydown", function(e) {
+		if(e.keyCode==37) {
+			//detailBox.prev();
+		} else if(e.keyCode==39) {
+			//detailBox.next();
+		} else if(e.keyCode==27) {
+			if (cal.getIsActive()) {
+				//cal.hide();
+			} else {
+				//detailBox.doEscapeAction();
+			}
+		}
+	}, true);
+
+	//listBoxClosure();
+
+</script>
+</html>
