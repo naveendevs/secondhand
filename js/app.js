@@ -151,12 +151,12 @@ function initializeMap() {
 	var imageMarker = new google.maps.MarkerImage("images/loc.png",
         new google.maps.Size(32, 52), 
         new google.maps.Point(0,0),
-        new google.maps.Point(0, 52)
+        new google.maps.Point(16, 52)
     );
 	var imageMarkerSelected = new google.maps.MarkerImage("images/loc.png",
         new google.maps.Size(32, 52), 
         new google.maps.Point(0,0),
-        new google.maps.Point(0, 55)
+        new google.maps.Point(16, 52)
     );
 	
     infoBox = new InfoBox({
@@ -173,6 +173,14 @@ function initializeMap() {
         infoBoxClearance: new google.maps.Size(1, 1)
     });
 	
+    var selectMarkerInfoBox = new InfoBox({
+		disableAutoPan: true,
+		pixelOffset: new google.maps.Size(-115, -100),
+		zIndex: 10,
+        closeBoxURL: "",
+        infoBoxClearance: new google.maps.Size(1, 1)
+    });
+
 	var circleOptions = {
       strokeColor: '#888888',
       strokeOpacity: 0.5,
@@ -307,11 +315,18 @@ function initializeMap() {
 		redrawResults : function(data) {
 			drawResultsOnMap(data);
 		},
-		highlightMarker: function(id) {
-			markerCache[id].setIcon(imageMarkerSelected);
+		highlightMarker: function(_data) {
+			//change icon of selected marker
+			markerCache[_data.adId].setIcon(imageMarkerSelected);
+			
+			//render infobox for selected marker
+			var selectMarkerContent = Mustache.render(get('map_marker_selected_el').innerHTML, _data);
+			selectMarkerInfoBox.setContent(selectMarkerContent);
+			selectMarkerInfoBox.open(map, markerCache[_data.adId]);
 		},
-		unhighlightMarker: function(id) {
-			markerCache[id].setIcon(imageMarker);
+		unhighlightMarker: function(_data) {
+			markerCache[_data.adId].setIcon(imageMarker);
+			selectMarkerInfoBox.close();
 		}
 	}
 }
@@ -371,10 +386,10 @@ function listBoxClosure() {
 			unShortlist(data.adId, true);
 		});
 		get('shortlist-'+data.adId).addEventListener("mouseover", function(){ 
-			mapObj.highlightMarker(data.adId);
+			mapObj.highlightMarker(data);
 		});
 		get('shortlist-'+data.adId).addEventListener("mouseout", function(){ 
-			mapObj.unhighlightMarker(data.adId);
+			mapObj.unhighlightMarker(data);
 		});
 	}
 
@@ -414,7 +429,7 @@ function listBoxClosure() {
 				// format posted date time
 				d.displaypostedDateTime = getAgo(d.postedDateTime);
 
-				var template = document.getElementById('main_list_el').innerHTML;
+				var template = get('main_list_el').innerHTML;
 				get('main-list').insertAdjacentHTML('beforeend', Mustache.render(template, d));
 
 				var shortListIcon = get('mainlist-action-'+d.adId);
@@ -426,15 +441,19 @@ function listBoxClosure() {
 					}
 				});
 				get('mainlist-'+d.adId).addEventListener("mouseover", function(){ 
-					mapObj.highlightMarker(d.adId);
+					mapObj.highlightMarker(d);
 				});
 				get('mainlist-'+d.adId).addEventListener("mouseout", function(){ 
-					mapObj.unhighlightMarker(d.adId);
+					mapObj.unhighlightMarker(d);
 				});
 			};
 			inner(data[i]);
 		}
-
+		
+		if (xcess.shortlistedCount==0) {
+			var template = document.getElementById('short_list_empty_el').innerHTML;
+			get('short-list').innerHTML+=Mustache.render(template, {message: 'Shortlist is empty'});
+		}
 	}
 	
 	function appendToMainList2(data) {

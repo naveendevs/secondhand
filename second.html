@@ -16,6 +16,8 @@
 	<script type="text/javascript" src="js/app.js"></script>
 
 	<!-- MUSTACHE TEMPLATES-->
+
+	<!-- SHORT LIST ITEM -->
 	<script id="short_list_el" type="text/html">
 		<div class="list-item-main" id="shortlist-{{adId}}">
 			<div class="shortlist-item-pic" style="background-image: url({{coverPhoto.url}});"></div>
@@ -35,6 +37,7 @@
 		</div>
 	</script>
 
+	<!-- MAIN LIST ITEM -->
 	<script id="main_list_el" type="text/html">
 		<div class="list-item-main" id="mainlist-{{adId}}">
 			<div class="list-item-pic" style="background-image: url({{coverPhoto.url}});"></div>
@@ -53,15 +56,28 @@
 			</div>
 		</div>
 	</script>
-	
+
+	<!-- SHORTLIST EMPTY VIEW -->
 	<script id="short_list_empty_el" type="text/html">
 		<div class="shortlist-empty-message">
 			{{message}}
 		</div>
 	</script>
+
+	<!-- MAP SELECTED MARKER -->
+	<script id="map_marker_selected_el" type="text/html">
+		<div class="map-marker-selected-wrapper">
+			<div class="map-marker-selected-photo" style="background-image: url({{coverPhoto.url}});"></div>
+			<div class="map-marker-selected-content">
+				<div class="map-marker-selected-title">{{title}}</div>
+				<div class="map-marker-selected-price"><div class="list-item-price-currency icon left" data-icon="&#xe017;"></div>{{price}}</div>
+			</div>
+		</div>
+	</script>
+
+	<!-- /MUSTACHE TEMPALTES -->
+
     <script type="text/javascript">
-
-
 
 //common JS
 function detailBoxClosure() {
