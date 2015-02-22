@@ -67,7 +67,9 @@ var radiusInfo;
 var mapObj;
 
 function initializeMap() {
-	markerCache = {};
+	var markerCache = {};
+	var centerAddress = "";
+	
 	function relocate() {
 		//ajax call to get loaction name and city and country
 		var xmlhttp;
@@ -79,15 +81,15 @@ function initializeMap() {
 				//setMask(false);
 				var get = function(el) { return document.getElementById(el) };
 				var data = JSON.parse(xmlhttp.responseText);
-				var newFormattedAddress = '';
+				centerAddress = '';
 				if (data.results[0]!=undefined && data.results[0].formatted_address != undefined) {
 					var splittedAddress = data.results[0].formatted_address.split(',');
 					for (var i=0; i<splittedAddress.length-2; i++) {
-						newFormattedAddress += splittedAddress[i] + ',';
+						centerAddress += splittedAddress[i] + ',';
 					}
-					newFormattedAddress = newFormattedAddress.substr(0,newFormattedAddress.length-1);
+					centerAddress = centerAddress.substr(0,centerAddress.length-1);
 				}
-				document.getElementById('header-select-locality').value=newFormattedAddress;
+				document.getElementById('header-select-locality').value=centerAddress;
 			}
 		}
 		xmlhttp.open("GET","https://maps.googleapis.com/maps/api/geocode/json?latlng="+ map.getCenter().lat() + "," + map.getCenter().lng() +"&result_type=sublocality_level_1&key=AIzaSyDy_hwukpPRvw24Tr0J2sAM6iofOHQEThk",true);
@@ -120,12 +122,12 @@ function initializeMap() {
 					var get = function(el) { return document.getElementById(el) };
 					var data = JSON.parse(xmlhttp.responseText);
 					var splittedAddress = data.results[0].formatted_address.split(',');
-					var newFormattedAddress =  '';
+					centerAddress =  '';
 					for (var i=0; i<splittedAddress.length-2; i++) {
-						newFormattedAddress += splittedAddress[i] + ',';
+						centerAddress += splittedAddress[i] + ',';
 					}
-					newFormattedAddress = newFormattedAddress.substr(0,newFormattedAddress.length-1);
-					document.getElementById('header-select-locality').value=newFormattedAddress;
+					centerAddress = centerAddress.substr(0,centerAddress.length-1);
+					document.getElementById('header-select-locality').value=centerAddress;
 				}
 			}
 			xmlhttp.open("GET","https://maps.googleapis.com/maps/api/geocode/json?latlng="+ map.getCenter().lat() + "," + map.getCenter().lng() +"&result_type=sublocality_level_1	&key=AIzaSyDy_hwukpPRvw24Tr0J2sAM6iofOHQEThk",true);
@@ -220,11 +222,11 @@ function initializeMap() {
 		infoBox.close();
 	});
 	google.maps.event.addListener(centerMarker, 'mouseover', function(event) {
-		infoBox.setContent('<div class="map-infobox"><span class="map-infobox-highlight">'+ centerMarker.getPosition().toString() +'</span><BR>Drag to move circle</div>');
+		infoBox.setContent('<div class="map-infobox"><span class="map-infobox-highlight">'+ centerAddress +'</span><BR>Drag to move circle</div>');
 		infoBox.open(map, centerMarker);
 	});
 	google.maps.event.addListener(centerMarker, 'mouseup', function(event) {
-		infoBox.setContent('<div class="map-infobox"><span class="map-infobox-highlight">'+ centerMarker.getPosition().toString() +'</span><BR>Drag to move circle</div>');
+		infoBox.setContent('<div class="map-infobox"><span class="map-infobox-highlight">'+ centerAddress +'</span><BR>Drag to move circle</div>');
 		infoBox.open(map, centerMarker);
 		map.panTo(circle.getCenter());
 		relocate();
