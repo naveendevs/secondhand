@@ -40,7 +40,13 @@
 	<!-- MAIN LIST ITEM -->
 	<script id="main_list_el" type="text/html">
 		<div class="list-item-main" id="mainlist-{{adId}}">
-			<div class="list-item-pic" style="background-image: url({{coverPhoto.url}});"></div>
+			<div class="list-item-pic" style="background-image: url({{coverPhoto.url}});">
+				{{#verified}}
+					<div class="list-item-verified-icon-layer-1 icon" data-icon="&#xe01d;"></div>
+					<div class="list-item-verified-icon icon" data-icon="&#xe01c;"></div>
+				{{/verified}}
+				{{#hasSeen}}<div class="list-item-seen">SEEN</div>{{/hasSeen}}
+			</div>
 			<div class="list-item-content">
 				<div class="list-item-icons">
 					<div class="shortlist-action-icon icon left" data-icon="&#xe016;" data-value="0" id="mainlist-action-{{adId}}"></div>
@@ -51,7 +57,7 @@
 					<div class="list-item-location left">Used For <span class="list-item-highlight">2 years</span></div>
 					<div class="list-item-location left" style="margin-left:15px;">Condition <span class="list-item-highlight">Bad</span></div>
 				</div>
-				<div class="list-item-price"><div class="list-item-price-currency icon left" data-icon="&#xe017;"></div>{{price}}</div>
+				<div class="list-item-price"><div class="list-item-price-currency icon left" data-icon="&#xe017;"></div>{{price}}<span class="list-item-price-negotiable">{{#negotiable}} (Negotiable) {{/negotiable}}</span></div>
 				<div class="list-item-time">{{displaypostedDateTime}}</div>
 			</div>
 		</div>

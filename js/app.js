@@ -184,7 +184,7 @@ function initializeMap() {
     });
 
 	var circleOptions = {
-      strokeColor: '#888888',
+      strokeColor: '#005387',
       strokeOpacity: 0.5,
       strokeWeight: 2,
       fillColor: '#Fefefe',
