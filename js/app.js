@@ -177,7 +177,7 @@ function initializeMap() {
 	
     var selectMarkerInfoBox = new InfoBox({
 		disableAutoPan: true,
-		pixelOffset: new google.maps.Size(-115, -100),
+		pixelOffset: new google.maps.Size(-115, -130),
 		zIndex: 10,
         closeBoxURL: "",
         infoBoxClearance: new google.maps.Size(1, 1)
@@ -280,14 +280,16 @@ function initializeMap() {
 					position: latLng,
 					map: map,
 					icon: imageMarker,
-					animation: google.maps.Animation.DROP,
-					title: data.title + '-' + data.adId
+					animation: google.maps.Animation.DROP
 				});
 				google.maps.event.addListener(marker, 'mouseover', function(event) {
-					this.setIcon(imageMarkerSelected);
+					//this.setIcon(imageMarkerSelected);
+					mapObj.highlightMarker(data);
+					//alert('het');
 				});
 				google.maps.event.addListener(marker, 'mouseout', function(event) {
-					this.setIcon(imageMarker);
+					//this.setIcon(imageMarker);
+					mapObj.unhighlightMarker(data.adId);
 				});
 				google.maps.event.addListener(marker, 'click', function(event) {
 					this.setIcon(imageMarkerSelected);

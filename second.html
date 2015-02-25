@@ -20,7 +20,13 @@
 	<!-- SHORT LIST ITEM -->
 	<script id="short_list_el" type="text/html">
 		<div class="list-item-main" id="shortlist-{{adId}}">
-			<div class="shortlist-item-pic" style="background-image: url({{coverPhoto.url}});"></div>
+			<div class="shortlist-item-pic" style="background-image: url({{coverPhoto.url}});">
+				{{#verified}}
+					<div class="shortlist-item-verified-icon-layer-1 icon" data-icon="&#xe01d;"></div>
+					<div class="shortlist-item-verified-icon icon" data-icon="&#xe01c;"></div>
+				{{/verified}}
+				{{#hasSeen}}<div class="shortlist-item-seen">SEEN</div>{{/hasSeen}}
+			</div>
 			<div class="shortlist-item-content">
 				<div class="list-item-icons">
 					<div class="shortlist-action-icon selected icon left" data-icon="&#xe015;" data-value="0" id="shortlist-action-{{adId}}"></div>
