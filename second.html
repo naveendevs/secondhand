@@ -26,6 +26,7 @@
 					<div class="shortlist-item-verified-icon icon" data-icon="&#xe01c;"></div>
 				{{/verified}}
 				{{#hasSeen}}<div class="shortlist-item-seen">SEEN</div>{{/hasSeen}}
+				{{#hasContacted}}<div class="shortlist-item-contacted">CONTACTED</div>{{/hasContacted}}
 			</div>
 			<div class="shortlist-item-content">
 				<div class="list-item-icons">
@@ -34,11 +35,17 @@
 				<div class="list-item-title">{{title}}</div>
 				<div class="list-item-location"><div class="icon left" data-icon="&#xe006;"></div>{{location.area}}</div>
 				<div class="list-item-conditionWrapper">
-					<div class="list-item-location left">Used For <span class="list-item-highlight">2 years</span></div>
-					<div class="list-item-location left" style="margin-left:15px;">Condition <span class="list-item-highlight">Bad</span></div>
+					<div class="list-item-price left" style="margin-top:0px;"><div class="list-item-price-currency icon left" data-icon="&#xe017;"></div>{{price}}</div>
+					<div class="list-item-location left" style="margin:3px 0 0 10px;"><span class="list-item-highlight">2 years</span> <span class="list-item-highlight">Bad</span></div>
 				</div>
-				<div class="list-item-price"><div class="list-item-price-currency icon left" data-icon="&#xe017;"></div>{{price}}</div>
-				<div class="list-item-time">{{displaypostedDateTime}}</div>
+				<div class="shortlist-item-contact" style="clear:left; margin-top:25px; position:absolute; left:220px; right:0;bottom:10px;">
+					<img class="shortlist-item-contact-photo" src="cdn/profile/batar.png" />
+					<div style="margin:5px 0 0 10px; float:left;">
+						<div class="shortlist-item-contact-name"><strong>{{userInfo.firstName}} {{userInfo.lastName}}</strong></div>
+						<div class="shortlist-item-contact-name"><span></span><span><strong>{{userInfo.contact.phone}}</strong></span></div>
+					</div>
+					<div class="shortlist-item-contact-message-btn">Message</div>
+				</div>
 			</div>
 		</div>
 	</script>
@@ -52,6 +59,7 @@
 					<div class="list-item-verified-icon icon" data-icon="&#xe01c;"></div>
 				{{/verified}}
 				{{#hasSeen}}<div class="list-item-seen">SEEN</div>{{/hasSeen}}
+				{{#hasContacted}}<div class="list-item-contacted">CONTACTED</div>{{/hasContacted}}
 			</div>
 			<div class="list-item-content">
 				<div class="list-item-icons">
@@ -78,7 +86,7 @@
 
 	<!-- MAP SELECTED MARKER -->
 	<script id="map_marker_selected_el" type="text/html">
-		<div class="map-marker-selected-wrapper">
+		<div class="map-marker-selected-wrapper" id="marker-info-{{adId}}">
 			<div class="map-marker-selected-photo" style="background-image: url({{coverPhoto.url}});"></div>
 			<div class="map-marker-selected-content">
 				<div class="map-marker-selected-title">{{title}}</div>

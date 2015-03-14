@@ -190,6 +190,7 @@ function initializeMap() {
       fillColor: '#Fefefe',
       fillOpacity: 0.25,
       map: map,
+	  cursor: 'hand',
       center: map.center,
       radius: 1500
     };
