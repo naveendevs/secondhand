@@ -3,12 +3,13 @@
 <head>
 	<title>SecondHand.com</title>
 	<!-- CSS -->
-	<link rel="stylesheet" type="text/css" href="./style/style.css">
+	<link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="./css/style.css">
 
 	<!-- JS Libraries-->
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDy_hwukpPRvw24Tr0J2sAM6iofOHQEThk"></script>
 	<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
-	<!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.27/angular.min.js"></script> -->
+	<script type="text/javascript" src="js/lib/jquery-1.10.1.min.js"></script>
 	<script type="text/javascript" src="js/lib/mustache.min.js"></script>
 
 	<!-- JS APP -->
@@ -26,7 +27,7 @@
 					<div class="shortlist-item-verified-icon icon" data-icon="&#xe01c;"></div>
 				{{/verified}}
 				{{#hasSeen}}<div class="shortlist-item-seen">SEEN</div>{{/hasSeen}}
-				{{#hasContacted}}<div class="shortlist-item-contacted">CONTACTED</div>{{/hasContacted}}
+				{{#-hasContacted}}<div class="shortlist-item-contacted">CONTACTED</div>{{/-hasContacted}}
 			</div>
 			<div class="shortlist-item-content">
 				<div class="list-item-icons">
@@ -42,9 +43,12 @@
 					<img class="shortlist-item-contact-photo" src="cdn/profile/batar.png" />
 					<div style="margin:5px 0 0 10px; float:left;">
 						<div class="shortlist-item-contact-name"><strong>{{userInfo.firstName}} {{userInfo.lastName}}</strong></div>
-						<div class="shortlist-item-contact-name"><span></span><span><strong>{{userInfo.contact.phone}}</strong></span></div>
+						<div class="shortlist-item-contact-name"><span class="icon left" style="margin-right:4px;" data-icon="&#xe02a;"></span><span><strong>{{userInfo.contact.phone}}</strong></span></div>
 					</div>
-					<div class="shortlist-item-contact-message-btn">Message</div>
+					<div class="shortlist-item-contact-message-btn">
+						<span class="icon left" style="width:20px;text-align:left;" data-icon="&#xe030;"></span>
+						Message
+					</div>
 				</div>
 			</div>
 		</div>
@@ -59,7 +63,7 @@
 					<div class="list-item-verified-icon icon" data-icon="&#xe01c;"></div>
 				{{/verified}}
 				{{#hasSeen}}<div class="list-item-seen">SEEN</div>{{/hasSeen}}
-				{{#hasContacted}}<div class="list-item-contacted">CONTACTED</div>{{/hasContacted}}
+				{{#-hasContacted}}<div class="list-item-contacted">CONTACTED</div>{{/-hasContacted}}
 			</div>
 			<div class="list-item-content">
 				<div class="list-item-icons">
@@ -96,313 +100,6 @@
 	</script>
 
 	<!-- /MUSTACHE TEMPALTES -->
-
-    <script type="text/javascript">
-
-//common JS
-function detailBoxClosure() {
-	var isActive = false;
-	var isRequestBoxActive = false;
-	var isMessageBoxActive = false;
-
-    var photoIndex = 0;
-
-	var requestObj = {
-		noOfGuests: 1,
-		visitingDate: '',
-		visitingTime: '',
-		message: ''
-	};
-		
-	var setMask = function(flag) {
-		if(flag) {
-			document.getElementById('detail-box-loading').style.display="block";
-		} else {
-			document.getElementById('detail-box-loading').style.display="none";
-		}
-	};
-
-	return {
-		reset: function() {
-			document.getElementById('detail-box-content').scrollTop = 0;
-			document.getElementById('detail-box-tab-invite').className = "detail-box-content-tabs-tab active";
-			document.getElementById('detail-box-tab-profile').className = "detail-box-content-tabs-tab";
-			document.getElementById('detail-box-tab-history').className = "detail-box-content-tabs-tab";
-			document.getElementById('details-box-sub-actions').style.display = "none";
-			document.getElementById('details-box-request-field-guests').innerHTML = requestObj.noOfGuests;
-			this.hideRequestBox();
-			this.hideMessageBox();
-		},
-		open: function() {
-			setMask(true);
-			this.reset();
-			var xmlhttp;
-			if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
-				xmlhttp=new XMLHttpRequest();
-			}
-			else{ // code for IE6, IE5
-				xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-			}
-			xmlhttp.onreadystatechange=function() {
-				if (xmlhttp.readyState==4 && xmlhttp.status==200){
-					setMask(false);
-					var get = function(el) { return document.getElementById(el) };
-					var data = JSON.parse(xmlhttp.responseText);
-					
-					get('dbx-name').innerHTML = data.invite.user.fullName;
-
-					get('dbx-sexagelocation').innerHTML = data.invite.user.gender;
-					get('dbx-sexagelocation').innerHTML += ' | ' + getAge(data.invite.user.dob) + ' yrs';
-					get('dbx-sexagelocation').innerHTML += ' | ' + data.invite.user.address.area + ', ' + data.invite.user.address.city;
-					
-					if (data.invite.user.phoneVerified == 'Yes' && data.invite.user.creditCardVerified == 'Yes') {
-						get('dbx-verified').style.display = 'block';
-					} else {
-						get('dbx-verified').style.display = 'none';
-					}
-
-					//photos
-					get("dbx-photos").innerHTML="";
-					for (var x in data.invite.user.photos) {
-						if (x==0) {
-							get("dbx-photos").innerHTML += "<div class='detail-box-content-photo visible' style='background-image:URL(" + data.invite.user.photos[x].url + ")'></div>";
-						} else {
-							get("dbx-photos").innerHTML += "<div class='detail-box-content-photo' style='background-image:URL(" + data.invite.user.photos[x].url + ")'></div>";
-						}
-					}
-					
-					//invite details
-					get("dbx-offering").innerHTML="";
-					for (var x in data.invite.inviteOfferings) {
-						get("dbx-offering").innerHTML += "<div class='details-x-invite-offering'><div class='details-x-invite-offering-head'>"+ data.invite.inviteOfferings[x].head +"</div><div class='details-x-invite-offering-desc'>"+ data.invite.inviteOfferings[x].desc +"</div></div>";
-					}
-					get('dbx-requestsReceived').innerHTML = data.invite.requestsReceived;
-					get('dbx-requestsAccepted').innerHTML = data.invite.requestsAccepted;
-					get('dbx-lastAttendedDateTime').innerHTML = getAgo(data.invite.lastAttendedDateTime);
-					get('dbx-postedDateTime').innerHTML = getAgo(data.invite.postedDateTime);
-					get('dbx-preferredDay').innerHTML = data.invite.inviteDetail.preferredDay;
-					get('dbx-preferredTime').innerHTML = data.invite.inviteDetail.preferredTime;
-					
-					get('dbx-maxGuestsAllowed').innerHTML = data.invite.inviteDetail.maxGuestsAllowed;
-					get('dbx-preferredGender').innerHTML = data.invite.inviteDetail.preferredGender;
-					get('dbx-smokingAllowed').innerHTML = data.invite.inviteDetail.smokingAllowed;
-					get('dbx-kidsAllowed').innerHTML = data.invite.inviteDetail.kidsAllowed;
-					get('dbx-petsAllowed').innerHTML = data.invite.inviteDetail.petsAllowed;
-					get('dbx-overnightStay').innerHTML = data.invite.inviteDetail.overnightStay;
-					
-					//user profile
-					get('dbx-profileHead').innerHTML = data.invite.user.firstName.toUpperCase();
-					get('dbx-phoneVerified').innerHTML = data.invite.user.phoneVerified;
-					get('dbx-creditCardVerified').innerHTML = data.invite.user.creditCardVerified;
-
-					get('dbx-stayingWith').innerHTML = data.invite.user.userInfo.stayingWith;
-					get('dbx-stayingIn').innerHTML = data.invite.user.userInfo.stayingIn;
-					get('dbx-workDetails').innerHTML = data.invite.user.userInfo.workDetails;
-					get('dbx-schoolDetails').innerHTML = data.invite.user.userInfo.schoolDetails;
-					get('dbx-music').innerHTML = data.invite.user.userInfo.music;
-					get('dbx-movie').innerHTML = data.invite.user.userInfo.movie;
-					get('dbx-sports').innerHTML = data.invite.user.userInfo.sports;
-					get('dbx-food').innerHTML = data.invite.user.userInfo.food;
-					get('dbx-interests').innerHTML = data.invite.user.userInfo.interests;
-					get('dbx-smokes').innerHTML = data.invite.user.userInfo.smokes;
-					get('dbx-drinks').innerHTML = data.invite.user.userInfo.drinks;
-
-					//activity
-					get('dbx-invitesHosted').innerHTML = data.invite.user.userActivity.invitesHosted;
-					get('dbx-invitesAttended').innerHTML = data.invite.user.userActivity.invitesAttended;
-					get('dbx-feedbackCount').innerHTML = data.invite.user.userActivity.feedbackCount;
-					get('dbx-lastLogin').innerHTML = getAgo(data.invite.user.userActivity.lastLogin);
-
-					get('dbx-feedbacks').innerHTML = "";
-					for (var x in data.invite.user.feedbacks) {
-						var tmp = '<div class="details-x-feedback clearfix">';
-						tmp += '<img src="images/batar.png">';
-						tmp += '<div class="details-x-feedback-content"><div class="details-x-feedback-content-arrow icon" data-icon="&#xe002;"></div>';
-						tmp += '<p>' + data.invite.user.feedbacks[x].message + '</p>';
-						tmp += '<div class="details-x-feedback-content-time">' + getAgo(data.invite.user.feedbacks[x].timestamp) + '</div></div></div>';
-						get("dbx-feedbacks").innerHTML += tmp;
-					}
-
-					document.getElementById('detail-box').style.left='0px';
-					document.getElementById('detail-box-gallery-counter').innerHTML = (photoIndex+1)+" of "+ document.getElementsByClassName('detail-box-content-photo').length;
-
-					isActive=true;
-				}
-			}
-			//xmlhttp.open("GET","http://localhost:1337/getInvite?id=111",true);
-			xmlhttp.open("GET","./invite_detail.json",true);
-			xmlhttp.send();
-		},
-		init: function() {
-			//this.reset();
-			//document.getElementById('detail-box').style.left='0px';
-			//document.getElementById('detail-box-gallery-counter').innerHTML = (photoIndex+1)+" of "+ document.getElementsByClassName('detail-box-content-photo').length;
-			document.getElementById('detail-box-tab-invite').addEventListener("mousedown", function(){
-				document.getElementById('detail-box-content').scrollTop = document.getElementById('detail-box-content-invite').offsetTop-160;
-			});
-			document.getElementById('detail-box-tab-profile').addEventListener("mousedown", function(){
-				document.getElementById('detail-box-content').scrollTop = document.getElementById('detail-box-content-profile').offsetTop-160;
-			});
-			document.getElementById('detail-box-tab-history').addEventListener("mousedown", function(){
-				document.getElementById('detail-box-content').scrollTop = document.getElementById('detail-box-content-history').offsetTop-160;
-			});
-			
-			document.getElementById('detail-box-content').addEventListener("scroll", function(){
-			
-				//photo & tabs affix
-				if(document.getElementById('detail-box-content').scrollTop>175) {
-					document.getElementById('detail-box-top').className = "detail-box-top-fixed";
-					document.getElementById('detail-box-content').style.paddingTop = '336px';
-				} else {
-					document.getElementById('detail-box-top').className = "detail-box-top";
-					document.getElementById('detail-box-content').style.paddingTop = '0px';
-				}
-				
-				//tab selection on scroll
-				if(document.getElementById('detail-box-content').scrollTop >= document.getElementById('detail-box-content-history').offsetTop-175 || document.getElementById('detail-box-content').scrollTop >= (document.getElementById('detail-box-content').scrollHeight - document.getElementById('detail-box-content').clientHeight)) {
-					document.getElementById('detail-box-tab-invite').className = "detail-box-content-tabs-tab";
-					document.getElementById('detail-box-tab-profile').className = "detail-box-content-tabs-tab";
-					document.getElementById('detail-box-tab-history').className = "detail-box-content-tabs-tab active";
-				} 
-				else if(document.getElementById('detail-box-content').scrollTop >= document.getElementById('detail-box-content-profile').offsetTop-175) {
-					document.getElementById('detail-box-tab-invite').className = "detail-box-content-tabs-tab";
-					document.getElementById('detail-box-tab-profile').className = "detail-box-content-tabs-tab active";
-					document.getElementById('detail-box-tab-history').className = "detail-box-content-tabs-tab";
-				} 
-				else if(document.getElementById('detail-box-content').scrollTop >= 0) {
-					document.getElementById('detail-box-tab-invite').className = "detail-box-content-tabs-tab active";
-					document.getElementById('detail-box-tab-profile').className = "detail-box-content-tabs-tab";
-					document.getElementById('detail-box-tab-history').className = "detail-box-content-tabs-tab";
-				}
-			});
-		},
-		close: function() {
-			if (isActive==true) {
-				//reset stuff
-				document.getElementById('details-box-sub-actions').style.display = "none";
-				document.getElementById('detail-box').style.left='-500px';
-				isActive=false;
-			}
-		},
-		doEscapeAction: function() {
-			if(isRequestBoxActive || isMessageBoxActive) {
-				this.hideRequestBox();
-				this.hideMessageBox();
-			} else if(false) {
-				//close sub menus
-			} else {
-				this.close();
-			}
-		},
-		scrollToTabInvite: function() {
-			if (!isActive) {
-				this.open();
-			}
-			document.getElementById('detail-box-content').scrollTop = document.getElementById('detail-box-content-invite').offsetTop-160;
-		},
-		scrollToTabProfile: function() {
-			if (!isActive) {
-				this.open();
-			}
-			document.getElementById('detail-box-content').scrollTop = document.getElementById('detail-box-content-profile').offsetTop-160;
-		},
-		scrollToTabHistory: function() {
-			if (!isActive) {
-				this.open();
-			}
-			document.getElementById('detail-box-content').scrollTop = document.getElementById('detail-box-content-history').offsetTop-160;
-		},
-		showAltMenu: function() {
-			if (document.getElementById('details-box-sub-actions').style.display=='block') {
-				document.getElementById('details-box-sub-actions').style.display = "none";
-			}
-			else {
-				document.getElementById('details-box-sub-actions').style.display = "block";
-			}
-		},
-		//Request Box methods
-		showRequestBox: function() {
-			if (!isActive) {
-				this.open();
-			}
-			if (isRequestBoxActive) {
-				this.hideRequestBox();
-			} else {
-				if(isMessageBoxActive) {
-					this.hideMessageBox();
-				}
-				isRequestBoxActive=true;
-				document.getElementById('details-box-send-request').style.bottom = '40px';
-			}
-		},
-		hideRequestBox: function() {
-			cal.hide();
-			document.getElementById('details-box-send-request').style.bottom = document.getElementById('details-box-send-request').clientHeight*-1+'px';
-			isRequestBoxActive=false;
-		},
-		requestBoxDecreaseGuest: function() {
-			if (requestObj.noOfGuests>1) {
-				requestObj.noOfGuests--;
-				document.getElementById('details-box-request-field-guests').innerHTML = requestObj.noOfGuests;
-			}
-		},
-		requestBoxIncreaseGuest: function() {
-			if (requestObj.noOfGuests<5) {
-				requestObj.noOfGuests++;
-				document.getElementById('details-box-request-field-guests').innerHTML = requestObj.noOfGuests;
-			}
-		},
-		//Message Box methods
-		showMessageBox: function() {
-			if (isMessageBoxActive) {
-				this.hideMessageBox();
-			} else {
-				if(isRequestBoxActive) {
-					this.hideRequestBox();
-				}
-				isMessageBoxActive=true;
-				document.getElementById('details-box-message').style.bottom = '40px';
-			}
-		},
-		hideMessageBox: function() {
-			document.getElementById('details-box-message').style.bottom = document.getElementById('details-box-message').clientHeight*-1+'px';
-			isMessageBoxActive=false;
-		},
-		getIsActive: function() {
-			return isActive;
-		},
-		next:function(){
-			if(isActive && photoIndex < document.getElementsByClassName('detail-box-content-photo').length-1) {
-				document.getElementsByClassName('detail-box-content-photo')[photoIndex].style.webkitTransform='translate(-445px, 0px)';
-				document.getElementsByClassName('detail-box-content-photo')[photoIndex].style.transform='translate(-445px, 0px)';
-
-				document.getElementsByClassName('detail-box-content-photo')[photoIndex+1].style.webkitTransform='translate(0px, 0px)';
-				document.getElementsByClassName('detail-box-content-photo')[photoIndex+1].style.transform='translate(0px, 0px)';
-
-				photoIndex++;
-				document.getElementById('detail-box-gallery-counter').innerHTML = (photoIndex+1)+" of "+ document.getElementsByClassName('detail-box-content-photo').length;
-			}
-			return photoIndex;
-		},
-		prev:function(){
-			if(isActive && photoIndex>0) {
-				document.getElementsByClassName('detail-box-content-photo')[photoIndex].style.webkitTransform='translate(445px, 0px)';
-				document.getElementsByClassName('detail-box-content-photo')[photoIndex].style.transform='translate(445px, 0px)';
-
-				document.getElementsByClassName('detail-box-content-photo')[photoIndex-1].style.webkitTransform='translate(0px, 0px)';
-				document.getElementsByClassName('detail-box-content-photo')[photoIndex-1].style.transform='translate(0px, 0px)';
-
-				photoIndex--;
-				document.getElementById('detail-box-gallery-counter').innerHTML = (photoIndex+1)+" of "+ document.getElementsByClassName('detail-box-content-photo').length;
-			}
-			return photoIndex;
-		}
-	}
-};
-var detailBox = new detailBoxClosure();
-var cal;
-</script>
-
 <style>
 html, body {
 	line-height:1.4;
@@ -411,6 +108,8 @@ html, body {
     padding:0;
     margin:0;
 	overflow-y:hidden;
+	-webkit-tap-highlight-color: transparent;
+	-webkit-font-smoothing: antialiased;	
 }
 
 .left {
@@ -978,39 +677,12 @@ input,textarea {
 	left:0;
 	background: url(images/ajax_loader.gif) no-repeat center center;
 }
-.detail-box-wrapper {
-	bottom:0;
-	width:500px;
-	height:100%;
-	position:fixed;
-	z-index:1;
-	left:-500px;
-    -webkit-transition-property: left; /* Safari */
-    -webkit-transition-duration: 0.5s; /* Safari */
-    transition-property: left;
-    transition-duration: 0.5s;
-}
-.detail-box-content-wrapper {
-	width:450px;
+.-detail-box-content-wrapper {
 	height:100%;
 	float:left;
 }
-.detail-box-content {
-	//border-right:1px solid #fafafa;
-	//padding-right:1px;
-	width:450px;
-    position:absolute;
-	background:#fff;
-    bottom:0px;
-    top:40px;
-    overflow-x:hidden;
-    overflow-y:auto;
-    -moz-box-shadow: 2px 2px 18px #333333;
-    -webkit-box-shadow: 2px 2px 18px #333333;
-    box-shadow: 2px 2px 18px #333333;
-}
 
-.details-x {
+.-details-x {
 	box-sizing: border-box;
 	width:100%;
 	padding:20px 10px;
@@ -1018,38 +690,12 @@ input,textarea {
 	clear:both;
 }
 
-.detail-box-close-btn{
-	color:#efefef;
-	text-align:center;
-	font-size:24px;
-	width:40px;
-	height:40px;
-	line-height:40px;
-	position:fixed;
-	margin-top:40px;
-	margin-left:452px;
-	z-index:99999;
-	background:#444444;
-    -moz-box-shadow: 2px 2px 10px #aaaaaa;
-    -webkit-box-shadow: 2px 2px 10px #aaaaaa;
-    box-shadow: 2px 2px 10px #aaaaaa;
-    -webkit-transition-property: color, font-size; /* Safari */
-    -webkit-transition-duration: .2s; /* Safari */
-    transition-property: color, font-size;
-    transition-duration: .2s;
-}
-.detail-box-close-btn:hover{
-	cursor:pointer;
-	color:#fefefe;
-}
-
-.detail-box-top-fixed {
+.-detail-box-top-fixed {
 	position:fixed;
 	top:-135px;
 
 	overflow:hidden;
 	display:block;
-	width:440px;
 	z-index:2;
 	height:350px;
 }
@@ -1066,8 +712,13 @@ input,textarea {
 	background:#333333;
 	overflow:hidden;
 	display:block;
-	width:440px;
+	width:100%;
 	z-index:2;
+	cursor: ne-resize;
+
+    -moz-box-shadow: 0px 3px 10px #dedede;
+    -webkit-box-shadow: 0px 3px 10px #dedede;
+    box-shadow: 0px 3px 10px #dedede;
 }
 .detail-box-content-photos:hover .detail-box-content-photos-prev {
 	opacity:0.2;
@@ -1128,34 +779,8 @@ input,textarea {
 	cursor:pointer;
 	opacity:0.7 !important;
 }
-.detail-box-content-photo-text {
-	width:100%;
-	position:absolute;
-	top:240px;
-	left:0;
-	font-size:12px;
-	color:#fff;
-    -moz-text-shadow: 2px 2px 2px #333333;
-    -webkit-text-shadow: 2px 2px 2px #333333;
-    text-shadow: 2px 2px 2px #333333;
-}
-.detail-box-content-photo-text-left {
-	width:300px;
-	float:left;
-	text-align:left;
-	padding-left:10px;
-	padding-top:15px;
-	line-height:1.28;
-}
-.detail-box-content-photo-text-right {
-	width:80px;
-	float:right;
-	text-align:right;
-	padding-right:10px;
-	padding-top:40px;
-}
 .detail-box-content-photo{
-    width: 440px;
+    width: 555px;
     height: 300px;
     background-size: cover;
     background-repeat: no-repeat;
@@ -1164,12 +789,12 @@ input,textarea {
 	position:absolute;
 	float:left;
 	-webkit-transition: 300ms;
-	-webkit-transform: translate(445px, 0px) translateZ(0px); 
-	-moz-transform: translate(445px, 0px) translateZ(0px);
+	-webkit-transform: translate(560x, 0px) translateZ(0px); 
+	-moz-transform: translate(560px, 0px) translateZ(0px);
 	-moz-transition: 300ms;
-	-ms-transform: translate(445px, 0px) translateZ(0px);
+	-ms-transform: translate(560px, 0px) translateZ(0px);
 	-ms-transition: 300ms;
-	transform: translate(445px, 0px) translateZ(0px);
+	transform: translate(560px, 0px) translateZ(0px);
 	transition: 300ms;
 }
 .detail-box-content-tabs-wrapper{
@@ -1187,7 +812,7 @@ input,textarea {
 	border-right: 1px solid rgba(196,206,223,0.4);
 	line-height:34px;
 	height:34px;
-	width:33%;
+	width:49.7%;
     display:inline-block;
 	float:left;
 	text-align:center;
@@ -1288,12 +913,43 @@ a {
 	width:100%;
 	clear:both;
 }
+.details-list-wrapper {
+	width: 100%;
+	float: left;
+	position: relative;
+	padding: 0 10px;
+	min-height: 40px;
+	box-sizing: border-box;
+	font-size: 14px;
+}
+.details-list-head {
+	height:40px;
+	line-height:40px;
+	float:left;
+}
+.details-list-value:hover {
+	background:#fdfdfd;
+}
+.details-list-value {
+	clear:both;
+	text-align:left;
+    white-space: nowrap; 
+    overflow: hidden;
+	text-overflow: ellipsis; 
+	border: 1px solid #efefef;
+	padding: 5px 10px;
+	margin-top: 5px;
+	background: #fff;	
+	cursor:pointer;
+}
+
+
 .details-x-invite-keyvalue-full {
 	width:100%;
 	float:left;
 	position:relative;
 	padding:0 10px;
-	height:40px;
+	min-height:40px;
 	line-height:40px;
 	box-sizing: border-box;
 	font-size:14px;
@@ -1303,7 +959,7 @@ a {
 	float:left;
 	position:relative;
 	padding:0 10px;
-	height:40px;
+	min-height:40px;
 	line-height:40px;
 	box-sizing: border-box;
 	font-size:14px;
@@ -1315,7 +971,7 @@ a {
 }
 .details-x-invite-key {
 	float:left;
-	color:#aaaaaa;
+	color:#777;
 }
 .details-x-invite-value {
 	float:right;
@@ -1329,10 +985,8 @@ a {
 }
 .details-x-head {
 	font-size:18px;
-	padding:0 0 0 10px;
-	height:35px;
-	margin-bottom:10px;
-	border-bottom:1px solid #dddddd;
+	padding:15px 0 0 10px;
+	clear:both;
 }
 
 .details-box-action-container {
@@ -1601,9 +1255,9 @@ a {
 }
 
 .details-x-feedback img{
-	width:75px;
-	height:75px;
-	border-radius:75px;
+	width:50px;
+	height:50px;
+	border-radius:50%;
 	float:left;
 }
 .details-x-feedback-content-time {
@@ -1626,8 +1280,8 @@ a {
 .details-x-feedback-content {
 	float:right;
 	position:relative;
-	width:270px;
-	padding:0px 20px;
+	width:440px;
+	padding:10px 20px;
 	border-radius:3px;
 	background:#f5f5f5;
 }
@@ -1671,338 +1325,6 @@ a {
 
 
 <div id="detail-box-loading" class="detail-box-loading-wrapper"></div>
-<div id="detail-box" class="detail-box-wrapper">
-	<div id="detail-box-main" class="detail-box-content-wrapper">
-		<div style="height:40px;"></div>
-		<div id="detail-box-content" class="detail-box-content">
-		<!-- detail fixed -->
-		<div id="detail-box-top" style="width:440px;outline: none;" tabindex="999">
-			<div id="detail-box-content-photo" class="detail-box-content-photos">
-				<div id="dbx-photos">
-					<div class="detail-box-content-photo visible" data-index="0" style="background-image:URL(cdn/photos/pooja_pics/0.jpg);"></div>
-					<div class="detail-box-content-photo" data-index="1" style="background-image:URL(cdn/photos/pooja_pics/9.jpg);"></div>
-				</div>
-				<div class="detail-box-content-photos-prev icon" onclick="detailBox.prev()" data-icon="&#xe002;"></div>
-				<div class="detail-box-content-photos-next icon" onclick="detailBox.next()" data-icon="&#xe003;"></div>
-				<div class="detail-box-content-photo-text">
-					<div class="detail-box-content-photo-text-left">
-						<div style="clear:both;width:100%;">
-						<span class="detail-box-content-name" id="dbx-name">Pooja Sharma</span><span class="detail-box-content-verified" id="dbx-verified">VERIFIED</span>
-						</div>
-						<div style="float:none;clear:both;font-size:12px;" id="dbx-sexagelocation">Female | 25 yrs | Gurgaon, India</div>
-					</div>
-					<div class="detail-box-content-photo-text-right" id="detail-box-gallery-counter"></div>
-				</div>
-			</div>
-			<div class="detail-box-content-tabs-wrapper">
-				<div id="detail-box-tab-invite" class="detail-box-content-tabs-tab">INVITE</div>
-				<div id="detail-box-tab-profile" class="detail-box-content-tabs-tab">POOJA</div>
-				<div id="detail-box-tab-history" class="detail-box-content-tabs-tab">POOJA ON INVITO</div>
-			</div>
-			</div> 
-			<!-- /detail fixed -->
-			
-			<div id="detail-box-content-invite" class="details-x">
-
-				<div class="details-x-head">INVITE DETAILS</div>
-
-				<div class="details-x-invite-offering-wrapper" id="dbx-offering">
-					<div class="details-x-invite-offering">
-						<div class="details-x-invite-offering-head">Dinner</div>
-						<div class="details-x-invite-offering-desc">OKish penne in white sauce and vegetable fried rice.</div>
-					</div>
-					<div class="details-x-invite-offering">
-						<div class="details-x-invite-offering-head">Music Performance</div>
-						<div class="details-x-invite-offering-desc">I play guitar, keyboard and will sing couple of pop favourites (Maroon 5, Passenger, Coldplay...)</div>
-					</div>
-					<div class="details-x-invite-offering">
-						<div class="details-x-invite-offering-head">Karaoke</div>
-						<div class="details-x-invite-offering-desc">Sing along :)</div>
-					</div>
-				</div>
-				
-				<div class="separator-95"></div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Requests Received</div>
-						<div class="details-x-invite-value" id="dbx-requestsReceived">24</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Accepted</div>
-						<div class="details-x-invite-value" id="dbx-requestsAccepted">5</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Posted</div>
-						<div class="details-x-invite-value" id="dbx-postedDateTime">2 months ago</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Last Attended</div>
-						<div class="details-x-invite-value" id="dbx-lastAttendedDateTime">6 days ago</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Preferred Day</div>
-						<div class="details-x-invite-value" id="dbx-preferredDay">Weekend</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Preferred Time</div>
-						<div class="details-x-invite-value" id="dbx-preferredTime">Evening</div>
-					</div>
-				</div>
-	
-				<div class="space-20"></div>
-				
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Max number of guests</div>
-						<div class="details-x-invite-value" id="dbx-maxGuestsAllowed">5</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Gender preference</div>
-						<div class="details-x-invite-value" id="dbx-preferredGender">None</div>
-					</div>
-				</div>
-
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Smoking Allowed</div>
-						<div class="details-x-invite-value" id="dbx-smokingAllowed">Yes</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Kids Allowed</div>
-						<div class="details-x-invite-value" id="dbx-kidsAllowed">No</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Pets Allowed</div>
-						<div class="details-x-invite-value" id="dbx-petsAllowed">Yes</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Overnight Stay</div>
-						<div class="details-x-invite-value" id="dbx-overnightStay">No</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="space-20"></div>
-
-			<div id="detail-box-content-profile" class="details-x">
-
-				<div class="details-x-head">ABOUT <span id="dbx-profileHead">POOJA</span></div>
-
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Phone Number Verified</div>
-						<div class="details-x-invite-value" id="dbx-phoneVerified">Yes</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Credit Card Verified</div>
-						<div class="details-x-invite-value" id="dbx-creditCardVerified">No</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Staying with</div>
-						<div class="details-x-invite-value" id="dbx-stayingWith">Alone</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Staying in</div>
-						<div class="details-x-invite-value" id="dbx-stayingIn">Rented Apartment</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue-full">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Work</div>
-						<div class="details-x-invite-value" id="dbx-workDetails">Assistant Manager, American Express</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue-full">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">College/School</div>
-						<div class="details-x-invite-value" id="dbx-schoolDetails">BE, MNIT, Jaipur</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue-full">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Music</div>
-						<div class="details-x-invite-value" id="dbx-music">Metal, Pop, Jazz</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue-full">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Movie</div>
-						<div class="details-x-invite-value" id="dbx-movie">Comedy, Documentary, Romance</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue-full">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Sports</div>
-						<div class="details-x-invite-value" id="dbx-sports">Football, Badminton, Chess</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue-full">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Food</div>
-						<div class="details-x-invite-value" id="dbx-food">Italian, Chinese, Junk Food</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue-full">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Interests</div>
-						<div class="details-x-invite-value" id="dbx-interests">Guitar, Theatre, Travel</div>
-					</div>
-				</div>
-
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Smokes</div>
-						<div class="details-x-invite-value" id="dbx-smokes">Yes</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Drinks</div>
-						<div class="details-x-invite-value" id="dbx-drinks">Yes</div>
-					</div>
-				</div>
-				
-			</div>
-
-			<div class="space-20"></div>
-
-			<div id="detail-box-content-history" class="details-x">
-
-				<div class="details-x-head">ACTIVITY/FEEDBACKS</div>
-
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Invites Hosted</div>
-						<div class="details-x-invite-value" id="dbx-invitesHosted">1</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Attended</div>
-						<div class="details-x-invite-value" id="dbx-invitesAttended">5</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Feedbacks</div>
-						<div class="details-x-invite-value" id="dbx-feedbackCount">8</div>
-					</div>
-				</div>
-				<div class="details-x-invite-keyvalue">
-					<div class="details-x-invite-keyvalue-inner">
-						<div class="details-x-invite-key">Last Login</div>
-						<div class="details-x-invite-value" id="dbx-lastLogin">30 mins ago</div>
-					</div>
-				</div>
-
-				<div class="space-20"></div>
-
-				<div id="dbx-feedbacks">
-					<div class="details-x-feedback clearfix">
-						<img src="images/batar.png">
-						<div class="details-x-feedback-content">
-							<div class="details-x-feedback-content-arrow icon" data-icon="&#xe002;"></div>
-							<p>Some text here and some shit</p>
-							<div class="details-x-feedback-content-time">3 months ago</div>
-						</div>
-					</div>
-					<div class="details-x-feedback clearfix">
-						<img src="images/anki.png">
-						<div class="details-x-feedback-content">
-							<div class="details-x-feedback-content-arrow icon" data-icon="&#xe002;"></div>
-							<p>Don't forget to subscribe our blogDon't forget to subscribe our blogDon't forget to subscribe our blogDon't forget to subscribe our blogDon't forget to subscribe our blogDon't forget to subscribe our blog!</p>
-							<div class="details-x-feedback-content-time">10 months ago</div>
-						</div>
-					</div>
-					<div class="details-x-feedback clearfix">
-						<img src="images/pooja.png">
-						<div class="details-x-feedback-content">
-							<div class="details-x-feedback-content-arrow icon" data-icon="&#xe002;"></div>
-							<p>Don't forget to subscribe our blog!</p>
-							<div class="details-x-feedback-content-time">3 months ago</div>
-						</div>
-					</div>
-				</div>
-				
-
-			</div>
-			<div class="space-20"></div>
-			<div class="space-20"></div>
-
-		</div>
-		
-		<!-- Actions -->
-		<div class="details-box-action-container">
-			<div class="details-box-action action" style="width:200px" onclick="detailBox.showRequestBox()">SEND REQUEST</div>
-			<div class="details-box-action action" style="width:200px" onclick="detailBox.showMessageBox()">MESSAGE</div>
-			<div class="details-box-action icon action" onclick="detailBox.showAltMenu()" data-icon="&#xe011;" style="border-right:0;width:40px;font-size:22px;">
-				<div id="details-box-sub-actions" class="details-box-sub-actions-container" style="z-index:6;">
-					<div class="details-box-sub-action">ADD AS FRIEND</div>
- 					<div class="details-box-sub-action">REPORT/BLOCK</div>
-				</div>
-			</div>
-		</div>
-		<!-- /Actions -->
-		<!-- SEND REQUEST BOX -->		
-		<div id="details-box-send-request" class="details-box-request-container">
-			<div class="details-box-request-close-btn icon" onclick="detailBox.hideRequestBox()" data-icon="&#xe00a;"></div>
-			
-			<div class="details-box-request-field-guests">
-				<div class="left" style=""># of Guests (including you)</div>
-				<div class="details-box-request-field-guests-btn" style="" onclick="detailBox.requestBoxIncreaseGuest()">+</div>
-				<div id ="details-box-request-field-guests" class="details-box-request-field-guests-input" style=""></div>
-				<div class="details-box-request-field-guests-btn" style="" onclick="detailBox.requestBoxDecreaseGuest()">-</div>
-			</div>
-			<div class="details-box-request-field-datetime" style="">
-				<div class="left" style="">Visiting On</div>
-				<div class="details-box-request-field-datetime-input left" style="" onclick="cal.select(this)">Click to select a date</div>
-<!-- 				<div class="left" style="margin-left:47px;">Around</div>
-				<div class="left" style=""><input /></div>
- -->			</div>
-			<div class="details-box-request-field-why" style="clear:both">
-				<textarea placeholder="Tell Pooja why you'd be a good company"></textarea>
-			</div>
-			<div class="invite-content-action" style="margin-top:15px;float:right;margin-right:0px;">SEND REQUEST</div>
-		</div>
-		<!-- /SEND REQUEST BOX -->		
-		<!-- MESSAGE BOX -->		
-		<div id="details-box-message" class="details-box-message-container">
-			<div class="details-box-request-close-btn icon" onclick="detailBox.hideMessageBox()" data-icon="&#xe00a;"></div>
-			
-			<div class="left" style="clear:both;margin:15px 0 15px 0;">Send a message to Pooja</div>
-			<div class="details-box-request-field-why" style="clear:both;">
-				<textarea placeholder="Be nice to her :)"></textarea>
-			</div>
-			<div class="invite-content-action" style="margin-top:15px;float:right;margin-right:0px;">SEND MESSAGE</div>
-		</div>
-		<!-- /MESSAGE BOX -->		
-
-	</div>
-	<div class="detail-box-close-btn icon" data-icon="&#xe00a;" onclick="detailBox.close();"></div>
 </div>
 
 
@@ -2077,13 +1399,15 @@ a {
 	</div>
 
     <div id="right">
+		
+		<!-- LISTING -->
+	
 		<div class="tab-wrapper">
 			<div class="tab active left" id="main-list-tab"><b>120</b> Results within 100 kms</div>
 			<div class="tab left" id="short-list-tab"><b id="short-list-shortlisted-count">0</b> Shortlisted / <b id="short-list-contacted-count">0</b> Contacted</div>
 		</div>
 
-		<div class="invites-wrapper hidden" style="height:auto;width:100%;top:40px" id="short-list">
-		</div>
+		<div id="short-list" class="invites-wrapper" style="display:none;height:auto;width:100%;top:40px"></div>
 
 		<div class="sort-wrapper" id="sort-wrapper">
 			<div class="text-bold"><b>Show</b></div>
@@ -2101,27 +1425,161 @@ a {
 		</div>
 	</div>
 	
-	<!-- HTML TEMPLATES-->
-	<div id="TEMPLATE-LISTITEM" style="display:none">
-		<div class="list-item-main">
-			<div class="list-item-pic" style="background-image:url(./cdn/pic2.jpg)"></div>
-			<div class="list-item-content">
-				<div class="list-item-icons">
-					<div class="icon left" data-icon="&#xe00e;"></div>
-					<div class="icon left" data-icon="&#xe007;"></div>
+	<!-- List holder -->
+	<div id="TEMPLATE-LISTITEM" style="display:none"></div>
+	<!-- /List holder-->
+
+	<!-- /LISTING -->
+
+	
+	<!-- Detail holder -->
+	<div id="detail-box" class="detail-box-wrapper">
+	<div id="detail-box-main" class="detail-box-content-wrapper">
+		<div id="detail-box-close-btn" class="detail-box-close-btn icon" data-icon="&#xe00a;"></div>
+		<div id="detail-box-content" class="detail-box-content">
+			<!-- detail fixed -->
+			<div id="detail-box-top" style="width:;outline: none;" tabindex="-1">
+				<div id="detail-box-content-photo" class="detail-box-content-photos">
+					<div id="dbx-photos">
+						<div class="detail-box-content-photo visible" data-index="0" style="background-image:URL(cdn/pic2.jpg);"></div>
+						<div class="detail-box-content-photo" data-index="1" style="background-image:URL(cdn/pic1.jpg);"></div>
+					</div>
+					<div class="detail-box-content-photos-prev icon" onclick="detailBox.prev()" data-icon="&#xe002;"></div>
+					<div class="detail-box-content-photos-next icon" onclick="detailBox.next()" data-icon="&#xe003;"></div>
+					<div class="detail-box-content-photo-text">
+						<div class="detail-box-content-photo-text-left">
+							<div style="clear:both;width:100%;font-size:22px;">
+								<span class="icon left" data-icon="&#xe017;"></span>18,000<span class="" style="font-size:12px;margin-left:5px;">negotiable</span>
+							</div>
+							<div style="clear:both;font-size:14px;">Apple iPhone 5 (16 GB)</div>
+						</div>
+						<div class="detail-box-content-photo-text-right">1 of 10</div>
+					</div>
 				</div>
-				<div class="list-item-title">Apple iPhone 5 (16 GB)</div>
-				<div class="list-item-location">5th Block. Koramangala</div>
-				<div style="margin-top:3px;width:100%;height:20px;">
-					<div class="list-item-location left">Used For <span style="color:#fff;border-radius:8px;padding:3px 10px;background:#27ae60;">2 years</span></div>
-					<div class="list-item-location left" style="margin-left:15px;">Condition <span style="color:#fff;border-radius:8px;padding:3px 10px;background:#27ae60;">Bad</span></div>
+				<div class="detail-box-content-tabs-wrapper hidden">
+					<div id="detail-box-tab-details" class="detail-box-content-tabs-tab">DETAILS</div>
+					<div id="detail-box-tab-contact" class="detail-box-content-tabs-tab">CONTACT</div>
 				</div>
-				<div class="list-item-price clearfix">Rs 15,000</div>
-				<div class="list-item-time"><span>2 mins ago</span></div>
+			</div> 
+			<!-- /detail fixed -->
+			
+			<div id="detail-box-content" class="" style="padding:0 10px; box-sizing:border-box;-webkit-tap-highlight-color: transparent;-webkit-font-smoothing: antialiased;">
+
+				<div class="space-20"></div>
+
+				<div style="padding:0 10px 10px 10px; clear:both;">
+					<div class="shortlist-item-contact" style="">
+						<img class="shortlist-item-contact-photo" src="cdn/profile/batar.png" />
+						<div style="margin:0px 0 0 10px; float:left;">
+							<div><strong>Prakalp Srivastava</strong></div>
+							<div><span class="icon left" style="margin-right:4px;" data-icon="&#xe02a;"></span><span><strong>8951546101</strong></span></div>
+							<div><span class="icon left" style="margin-right:4px;" data-icon="&#xe006;"></span><span><strong>Koramangala 5th Block, Bangalore</strong></span></div>
+						</div>
+						<div class="shortlist-item-contact-message-btn btn btn-primary">
+							<span class="icon left" style="width:20px;text-align:left;" data-icon="&#xe030;"></span>
+							Message
+						</div>
+					</div>
+				</div>
+				
+				<div class="space-20"></div>
+				<div style="padding:10px; clear:both;">
+					<div>Apple I Phone 4 Color Red. It Was Purchased In Year Of 2012. Good Working Condition. With Original Battery & Charger. 4". Screen Size. Touch Screen . Ready To Negotiate On Price. Buyers Who Are Interested In Buying My Product Can Directly Call On My Mobile Number. Thanks</div>
+				</div>
+
+				<div class="details-x-head">PRICE</div>
+
+				<div class="details-x-invite-keyvalue-full">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe017;"></span>Asking Price</div>
+						<div class="details-x-invite-value"><div class="icon left" data-icon="&#xe017;"></div> <span class="detail-box-large-text">18,000</span> negotiable</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe018;"></span>Bought For</div>
+						<div class="details-x-invite-value"><div class="icon left" data-icon="&#xe017;"></div> 36,000</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe038;"></span>Bill / Receipt</div>
+						<div class="details-x-invite-value">Available</div>
+					</div>
+				</div>
+
+				<div class="space-20"></div>
+
+				<div class="details-x-head">CONDITION & SPECIFICS</div>
+
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe039;"></span>Used for</div>
+						<div class="details-x-invite-value">2 years</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe03a;"></span>Warranty</div>
+						<div class="details-x-invite-value">None</div>
+					</div>
+				</div>
+
+				<div class="details-x-invite-keyvalue-full">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe03e;"></span>Damages</div>
+						<div class="details-x-invite-value">Minor Scratches</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue-full">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe023;"></span>Issues</div>
+						<div class="details-x-invite-value">Microphone doesn't work</div>
+					</div>
+				</div>
+
+				<div class="space-20"></div>
+				<div class="details-list-wrapper" style="clear:both;">
+					<div class="details-list-head details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe041;"></span>Verify product specifications and current price from online stores</div>
+					<div class="details-list-value"><a target="_blank" href="">http://www.flipkart.com/apple-iphone-5s/p/itmdv6f75dyxhmt4?pid=MOBDPPZZDX8WSPAT</a></div>
+					<div class="details-list-value"><a target="_blank" href="">http://www.amazon.in/Apple-MD101HN-13-inch-Mavericks-Graphics/dp/B00DKMCB20/ref=sr_1_1?ie=UTF8&qid=1422378909&sr=8-1&keywords=macbook+pro</a></div>
+					<div class="details-list-value"><a target="_blank" href="https://paytm.com/shop/p/apple-md101hn-a-laptop-4-gb-ddr3-500-gb-hdd-core-i5-2nd-gen-mac-os-x-lion-APPLE_MD101HNA_4GBDDR3_SILVER_21258">https://paytm.com/shop/p/apple-md101hn-a-laptop-4-gb-ddr3-500-gb-hdd-core-i5-2nd-gen-mac-os-x-lion-APPLE_MD101HNA_4GBDDR3_SILVER_21258</a></div>
+				</div>
+
+
+				<div class="space-20"></div>
+
+				<div class="details-x-head">COMMENTS</div>
+				<div id="dbx-feedbacks">
+					<div class="details-x-feedback clearfix">
+						<img src="cdn/profile/batar.png">
+						<div class="details-x-feedback-content">
+							<div class="details-x-feedback-content-arrow icon" data-icon="&#xe002;"></div>
+							<p>Reply toh karde bhai.. bechna hai ya nahi</p>
+							<div class="details-x-feedback-content-time">Vignesh Reddy | 3 months ago</div>
+						</div>
+					</div>
+					<div class="details-x-feedback clearfix">
+						<img src="cdn/profile/batar.png">
+						<div class="details-x-feedback-content">
+							<div class="details-x-feedback-content-arrow icon" data-icon="&#xe002;"></div>
+							<p>Mat lena be isse... haraami aadmi hai.</p>
+							<div class="details-x-feedback-content-time">Pramod Singh | 3 months ago</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="row">
+					<div class="col-md-offset-5 btn btn-primary" style="margin-top:20px;">Login to comment</div>
+				</div>
+
 			</div>
-		</div>
+
+			<div class="space-20"></div>
+
+			</div>
 	</div>
-	<!-- /HTML TEMPLATES-->
+	<!-- /Detail holder-->
 	
 </div>
 
@@ -2131,21 +1589,8 @@ a {
 	//google.maps.event.addDomListener(window, 'load', initialize());
 	//cal = new nCalendarClosure('details-box-send-request');
 	//detailBox.init();
-	document.addEventListener("keydown", function(e) {
-		if(e.keyCode==37) {
-			//detailBox.prev();
-		} else if(e.keyCode==39) {
-			//detailBox.next();
-		} else if(e.keyCode==27) {
-			if (cal.getIsActive()) {
-				//cal.hide();
-			} else {
-				//detailBox.doEscapeAction();
-			}
-		}
-	}, true);
 
 	//listBoxClosure();
-
+	//$("#detail-box").css("right",0)
 </script>
 </html>

@@ -18,45 +18,48 @@ var transitionEvent = whichTransitionEvent();
 
 var global;
 var map;
+
 function init() {
 
-var get = function(x) {
-	return document.getElementById(x);
-}
-var formatDate = function(dateTimeMS){
-	var d = new Date(dateTimeMS);
-	return d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear();
-};
-var getAgo = function(dateTimeMS) {
-	var t = new Date().getTime() - dateTimeMS;
-	var minutes = (t / 1000) / 60;
-	var hours = minutes / 60;
-	var days = hours / 24;
-	
-	if(days > 6) {
-		return 'on ' + formatDate(dateTimeMS);
+	var dataCache = {};
+
+	var get = function(x) {
+		return document.getElementById(x);
 	}
-	if(Math.floor(days) == 1) {
-		return '1 day ago';
+	var formatDate = function(dateTimeMS){
+		var d = new Date(dateTimeMS);
+		return d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear();
+	};
+	var getAgo = function(dateTimeMS) {
+		var t = new Date().getTime() - dateTimeMS;
+		var minutes = (t / 1000) / 60;
+		var hours = minutes / 60;
+		var days = hours / 24;
+		
+		if(days > 6) {
+			return 'on ' + formatDate(dateTimeMS);
+		}
+		if(Math.floor(days) == 1) {
+			return '1 day ago';
+		}
+		if(!(days < 1)) {
+			return Math.floor(days) + ' days ago';
+		}
+		if(Math.floor(hours) == 1) {
+			return '1 hour ago';
+		}
+		if (!(hours < 1)) {
+			return Math.floor(hours) + ' hours ago';
+		}
+		if(Math.floor(minutes) == 1) {
+			return '1 minute ago';
+		}
+		if (!(minutes < 1)) {
+			return Math.floor(minutes) + ' minutes ago';
+		} else {
+			return 'just now';
+		}
 	}
-	if(!(days < 1)) {
-		return Math.floor(days) + ' days ago';
-	}
-	if(Math.floor(hours) == 1) {
-		return '1 hour ago';
-	}
-	if (!(hours < 1)) {
-		return Math.floor(hours) + ' hours ago';
-	}
-	if(Math.floor(minutes) == 1) {
-		return '1 minute ago';
-	}
-	if (!(minutes < 1)) {
-		return Math.floor(minutes) + ' minutes ago';
-	} else {
-		return 'just now';
-	}
-}
 
 var circle;
 var radiusMarker;
@@ -390,11 +393,15 @@ function listBoxClosure() {
 		get('shortlist-action-'+data.adId).addEventListener("mousedown", function(){ 
 			unShortlist(data.adId, true);
 		});
-		get('shortlist-'+data.adId).addEventListener("mouseover", function(){ 
+		$('#shortlist-'+data.adId).on("mouseenter", function(){ 
 			mapObj.highlightMarker(data);
 		});
-		get('shortlist-'+data.adId).addEventListener("mouseout", function(){ 
+		$('#shortlist-'+data.adId).on("mouseleave", function(){ 
 			mapObj.unhighlightMarker(data.adId);
+		});
+		$('#shortlist-'+data.adId).on("click", function(e){ 
+			if($(e.target).is(".shortlist-action-icon")) return;
+			detailBox.show(dataCache[d.adId]);
 		});
 	}
 
@@ -430,9 +437,11 @@ function listBoxClosure() {
 	}
 
 	function appendToMainList(data) {
-		var i;
-		for (i in data) {
+		for (var i in data) {
 			function inner(d) {
+				//append in dataCache
+				dataCache[d.adId] = d;
+				
 				// format posted date time
 				d.displaypostedDateTime = getAgo(d.postedDateTime);
 
@@ -447,10 +456,14 @@ function listBoxClosure() {
 						unShortlist(d.adId, false)
 					}
 				});
-				get('mainlist-'+d.adId).addEventListener("mouseover", function(){ 
+				$('#mainlist-'+d.adId).on("click", function(e){ 
+					if($(e.target).is(".shortlist-action-icon")) return;
+					detailBox.show(dataCache[d.adId]);
+				});
+				$('#mainlist-'+d.adId).on("mouseenter", function(){ 
 					mapObj.highlightMarker(d);
 				});
-				get('mainlist-'+d.adId).addEventListener("mouseout", function(){ 
+				$('#mainlist-'+d.adId).on("mouseleave", function(){ 
 					mapObj.unhighlightMarker(d.adId);
 				});
 			};
@@ -463,102 +476,6 @@ function listBoxClosure() {
 		}
 	}
 	
-	function appendToMainList2(data) {
-		var i;
-		for (i in data) {
-		function inner(d) {
-			var listEl = get('main-list');
-			
-			var wrapper = document.createElement('div');
-			wrapper.className="list-item-main";
-			wrapper.addEventListener("mouseover", function(){ 
-				mapObj.highlightMarker(d.adId);
-			});
-			wrapper.addEventListener("mouseout", function(){ 
-				mapObj.unhighlightMarker(d.adId);
-			});
-			
-			
-				var image = document.createElement('div');
-				image.className="list-item-pic";
-				image.style.backgroundImage = "url("+d.coverPhoto.url+")";
-				wrapper.appendChild(image);
-				
-				var content = document.createElement('div');
-				content.className="list-item-content";
-				wrapper.appendChild(content);
-					var iconsWrapper = document.createElement('div');
-					iconsWrapper.className="list-item-icons";
-					content.appendChild(iconsWrapper);
-						//var icon = document.createElement('div');
-						//icon.className="icon left";
-						//icon.dataset.icon = "\uE00e";
-						//iconsWrapper.appendChild(icon);
-						var icon = document.createElement('div');
-						icon.className="shortlist-action-icon icon left";
-						icon.dataset.icon = "\uE016";
-						icon.dataset.value = "0";
-						icon.addEventListener("mousedown", function(){ 
-							if (icon.dataset.value == "0") {
-								icon.dataset.value = "1";
-								icon.dataset.icon = "\uE015";
-								icon.className = "shortlist-action-icon selected icon left";
-								shortlist(d, wrapper);
-							} else {
-								icon.dataset.value = "0";
-								icon.dataset.icon = "\uE016";
-								icon.className = "shortlist-action-icon icon left";
-								unShortlist(d.adId)
-							}
-						});
-
-						iconsWrapper.appendChild(icon);
-
-					var title = document.createElement('div');
-					title.className="list-item-title";
-					title.innerHTML = d.title;
-					content.appendChild(title);
-
-					var location = document.createElement('div');
-					location.className="list-item-location";
-					location.innerHTML = "<div class='icon left' data-icon='&#xe006;'></div>"+d.location.area;
-					content.appendChild(location);
-
-					var conditionWrapper = document.createElement('div');
-					conditionWrapper.className="list-item-conditionWrapper";
-					conditionWrapper.innerHTML = "<div class='list-item-location left'>Used For <span class='list-item-highlight'>2 years</span></div>";
-					conditionWrapper.innerHTML += "<div class='list-item-location left' style='margin-left:15px;'>Condition <span class='list-item-highlight'>Bad</span></div>";
-					content.appendChild(conditionWrapper);
-
-					var price = document.createElement('div');
-					price.className="list-item-price";
-					price.innerHTML = '<div class="list-item-price-currency icon left" data-icon="&#xe017;"></div>' + d.price;
-					content.appendChild(price);
-
-					var postedDateTime = document.createElement('div');
-					postedDateTime.className="list-item-time";
-					postedDateTime.innerHTML = getAgo(d.postedDateTime);
-					content.appendChild(postedDateTime);
-					
-			listEl.appendChild(wrapper);
-			
-			}
-			inner(data[i]);
-		}
-		
-		if (document.getElementById('list-load-more'))
-			document.getElementById('main-list-wrapper').removeChild(document.getElementById('list-load-more'));
-		
-		var loadMoreButton = document.createElement('div');
-		loadMoreButton.className="list-load-more";
-		loadMoreButton.innerHTML = "<span>Show More</span>";
-		loadMoreButton.id = "list-load-more";
-		loadMoreButton.addEventListener("mousedown", function(){
-			loadMore();
-		});		
-		document.getElementById('main-list-wrapper').appendChild(loadMoreButton);
-	}
-
 	function loadFirst() {
 		var xmlhttp;
 		if (window.XMLHttpRequest) {
@@ -601,7 +518,102 @@ function listBoxClosure() {
 		}		
 	}
 }
+
+
+function detailBoxClosure() {
+	var isActive = false;
+    var photoIndex = 0;
+
+	var requestObj = {
+		message: ''
+	};
+		
+	var setMask = function(flag) {
+		if(flag) {
+		} else {
+		}
+	};
+
+	var init = function () {
+		$("#detail-box-close-btn").click(function(){
+			_hide();
+		});
+	}
+	
+	var _hide = function() {
+		$('#detail-box').css('right', '-600px');
+	}
+	var _show = function() {
+		$('#detail-box').css('right', '0px');
+	}
+	
+	init();
+	
+	return {
+		reset: function() {
+			document.getElementById('detail-box-content').scrollTop = 0;
+		},
+		open: function() {
+			setMask(true);
+			this.reset();
+		},
+		init: function() {
+		},
+		hide: function() {
+			_hide();
+		},
+		show: function(data) {
+			if(data) {
+				console.log(data);
+			}
+			_show();
+		},
+		getIsActive: function() {
+			return isActive;
+		},
+		nextPhoto:function(){
+			if(isActive && photoIndex < document.getElementsByClassName('detail-box-content-photo').length-1) {
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex].style.webkitTransform='translate(-445px, 0px)';
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex].style.transform='translate(-445px, 0px)';
+
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex+1].style.webkitTransform='translate(0px, 0px)';
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex+1].style.transform='translate(0px, 0px)';
+
+				photoIndex++;
+				document.getElementById('detail-box-gallery-counter').innerHTML = (photoIndex+1)+" of "+ document.getElementsByClassName('detail-box-content-photo').length;
+			}
+			return photoIndex;
+		},
+		prevPhoto:function(){
+			if(isActive && photoIndex>0) {
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex].style.webkitTransform='translate(445px, 0px)';
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex].style.transform='translate(445px, 0px)';
+
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex-1].style.webkitTransform='translate(0px, 0px)';
+				document.getElementsByClassName('detail-box-content-photo')[photoIndex-1].style.transform='translate(0px, 0px)';
+
+				photoIndex--;
+				document.getElementById('detail-box-gallery-counter').innerHTML = (photoIndex+1)+" of "+ document.getElementsByClassName('detail-box-content-photo').length;
+			}
+			return photoIndex;
+		}
+	}
+};
+
+
 	google.maps.event.addDomListener(window, 'load', mapObj=initializeMap());
-	console.log(mapObj);
-	listBoxClosure();
+	//console.log(mapObj);
+	var listBox = listBoxClosure();
+	var detailBox = detailBoxClosure();
+	
+	document.addEventListener("keydown", function(e) {
+		if(e.keyCode==37) {
+			//detailBox.prev();
+		} else if(e.keyCode==39) {
+			//detailBox.next();
+		} else if(e.keyCode==27) {
+			detailBox.hide();
+		}
+	}, true);
+
 }
