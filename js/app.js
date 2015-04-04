@@ -458,6 +458,9 @@ function listBoxClosure() {
 				});
 				$('#mainlist-'+d.adId).on("click", function(e){ 
 					if($(e.target).is(".shortlist-action-icon")) return;
+					
+					$(".list-item-main").removeClass("active");
+					$('#mainlist-'+d.adId).addClass('active');
 					detailBox.show(dataCache[d.adId]);
 				});
 				$('#mainlist-'+d.adId).on("mouseenter", function(){ 
@@ -509,7 +512,7 @@ function listBoxClosure() {
 		}
 		xmlhttp.open("GET","list_json.json",true);
 		xmlhttp.send();
-	}		
+	}
 
 	loadFirst();
 	
@@ -527,6 +530,7 @@ function detailBoxClosure() {
 	var requestObj = {
 		message: ''
 	};
+	
 		
 	var setMask = function(flag) {
 		if(flag) {
@@ -543,8 +547,14 @@ function detailBoxClosure() {
 	var _hide = function() {
 		$('#detail-box').css('right', '-600px');
 	}
+	
 	var _show = function() {
 		$('#detail-box').css('right', '0px');
+	}
+	
+	var _loadData = function(data) {
+		var template = $('#detail-box-tmpl').html();
+		$('#detail-box-content').html(Mustache.render(template, data));
 	}
 	
 	init();
@@ -564,7 +574,7 @@ function detailBoxClosure() {
 		},
 		show: function(data) {
 			if(data) {
-				console.log(data);
+				_loadData(data);
 			}
 			_show();
 		},

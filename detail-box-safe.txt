@@ -1,0 +1,146 @@
+		<div id="detail-box-close-btn" class="detail-box-close-btn icon" data-icon="&#xe00a;"></div>
+		<div id="detail-box-content" class="detail-box-content">
+			<!-- detail fixed -->
+			<div id="detail-box-top" style="width:;outline: none;" tabindex="-1">
+				<div id="detail-box-content-photo" class="detail-box-content-photos">
+					<div id="dbx-photos">
+						<div class="detail-box-content-photo visible" data-index="0" style="background-image:URL(cdn/pic2.jpg);"></div>
+						<div class="detail-box-content-photo" data-index="1" style="background-image:URL(cdn/pic1.jpg);"></div>
+					</div>
+					<div class="detail-box-content-photos-prev icon" onclick="detailBox.prev()" data-icon="&#xe002;"></div>
+					<div class="detail-box-content-photos-next icon" onclick="detailBox.next()" data-icon="&#xe003;"></div>
+					<div class="detail-box-content-photo-text">
+						<div class="detail-box-content-photo-text-left">
+							<div style="clear:both;width:100%;font-size:22px;">
+								<span class="icon left" data-icon="&#xe017;"></span>18,000<span class="" style="font-size:12px;margin-left:5px;">negotiable</span>
+							</div>
+							<div style="clear:both;font-size:14px;">Apple iPhone 5 (16 GB)</div>
+						</div>
+						<div class="detail-box-content-photo-text-right">1 of 10</div>
+					</div>
+				</div>
+				<div class="detail-box-content-tabs-wrapper hidden">
+					<div id="detail-box-tab-details" class="detail-box-content-tabs-tab">DETAILS</div>
+					<div id="detail-box-tab-contact" class="detail-box-content-tabs-tab">CONTACT</div>
+				</div>
+			</div> 
+			<!-- /detail fixed -->
+			
+			<div id="detail-box-content" class="" style="padding:0 10px; box-sizing:border-box;-webkit-tap-highlight-color: transparent;-webkit-font-smoothing: antialiased;">
+
+				<div class="space-20"></div>
+
+				<div style="padding:0 10px 10px 10px; clear:both;">
+					<div class="shortlist-item-contact" style="">
+						<img class="shortlist-item-contact-photo" src="cdn/profile/batar.png" />
+						<div style="margin:0px 0 0 10px; float:left;">
+							<div><strong>Prakalp Srivastava</strong></div>
+							<div><span class="icon left" style="margin-right:4px;" data-icon="&#xe02a;"></span><span><strong>8951546101</strong></span></div>
+							<div><span class="icon left" style="margin-right:4px;" data-icon="&#xe006;"></span><span><strong>Koramangala 5th Block, Bangalore</strong></span></div>
+						</div>
+						<div class="" style="position:absolute;right:20px;">
+							<div class="shortlist-action-icon icon left" data-icon="&#xe016;" data-value="0" id="detail-box-action-1" style="margin-right:10px;line-height:36px;"></div>
+							<div class="btn btn-primary">
+								<span class="icon left" style="width:20px;text-align:left;" data-icon="&#xe030;"></span>
+								Message
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="space-20"></div>
+				<div style="padding:10px; clear:both;">
+					<div>Apple I Phone 4 Color Red. It Was Purchased In Year Of 2012. Good Working Condition. With Original Battery & Charger. 4". Screen Size. Touch Screen . Ready To Negotiate On Price. Buyers Who Are Interested In Buying My Product Can Directly Call On My Mobile Number. Thanks</div>
+				</div>
+
+				<div class="details-x-head">PRICE</div>
+
+				<div class="details-x-invite-keyvalue-full">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe017;"></span>Asking Price</div>
+						<div class="details-x-invite-value"><div class="icon left" data-icon="&#xe017;"></div> <span class="detail-box-large-text">18,000</span> negotiable</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe018;"></span>Bought For</div>
+						<div class="details-x-invite-value"><div class="icon left" data-icon="&#xe017;"></div> 36,000</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe038;"></span>Bill / Receipt</div>
+						<div class="details-x-invite-value">Available</div>
+					</div>
+				</div>
+
+				<div class="space-20"></div>
+
+				<div class="details-x-head">CONDITION & SPECIFICS</div>
+
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe039;"></span>Used for</div>
+						<div class="details-x-invite-value">2 years</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe03a;"></span>Warranty</div>
+						<div class="details-x-invite-value">None</div>
+					</div>
+				</div>
+
+				<div class="details-x-invite-keyvalue-full">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe03e;"></span>Damages</div>
+						<div class="details-x-invite-value">Minor Scratches</div>
+					</div>
+				</div>
+				<div class="details-x-invite-keyvalue-full">
+					<div class="details-x-invite-keyvalue-inner">
+						<div class="details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe023;"></span>Issues</div>
+						<div class="details-x-invite-value">Microphone doesn't work</div>
+					</div>
+				</div>
+
+				<div class="space-20"></div>
+				<div class="details-list-wrapper" style="clear:both;">
+					<div class="details-list-head details-x-invite-key"><span style="font-size:18px;margin-right:5px;" class="icon left" data-icon="&#xe041;"></span>Verify product specifications and current price from online stores</div>
+					<div class="details-list-value"><a target="_blank" href="">http://www.flipkart.com/apple-iphone-5s/p/itmdv6f75dyxhmt4?pid=MOBDPPZZDX8WSPAT</a></div>
+					<div class="details-list-value"><a target="_blank" href="">http://www.amazon.in/Apple-MD101HN-13-inch-Mavericks-Graphics/dp/B00DKMCB20/ref=sr_1_1?ie=UTF8&qid=1422378909&sr=8-1&keywords=macbook+pro</a></div>
+					<div class="details-list-value"><a target="_blank" href="https://paytm.com/shop/p/apple-md101hn-a-laptop-4-gb-ddr3-500-gb-hdd-core-i5-2nd-gen-mac-os-x-lion-APPLE_MD101HNA_4GBDDR3_SILVER_21258">https://paytm.com/shop/p/apple-md101hn-a-laptop-4-gb-ddr3-500-gb-hdd-core-i5-2nd-gen-mac-os-x-lion-APPLE_MD101HNA_4GBDDR3_SILVER_21258</a></div>
+				</div>
+
+
+				<div class="space-20"></div>
+
+				<div class="details-x-head">COMMENTS</div>
+				<div id="dbx-feedbacks">
+					<div class="details-x-feedback clearfix">
+						<img src="cdn/profile/batar.png">
+						<div class="details-x-feedback-content">
+							<div class="details-x-feedback-content-arrow icon" data-icon="&#xe002;"></div>
+							<p>Reply toh karde bhai.. bechna hai ya nahi</p>
+							<div class="details-x-feedback-content-time">Vignesh Reddy | 3 months ago</div>
+						</div>
+					</div>
+					<div class="details-x-feedback clearfix">
+						<img src="cdn/profile/batar.png">
+						<div class="details-x-feedback-content">
+							<div class="details-x-feedback-content-arrow icon" data-icon="&#xe002;"></div>
+							<p>Mat lena be isse... haraami aadmi hai.</p>
+							<div class="details-x-feedback-content-time">Pramod Singh | 3 months ago</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="row">
+					<div class="col-md-offset-5 btn btn-primary" style="margin-top:20px;">Login to comment</div>
+				</div>
+
+			</div>
+
+			<div class="space-20"></div>
+
+			</div>

@@ -1,3 +1,12 @@
+/* bootstrap overrides */
+
+.btn {
+	border-radius:2px !important;
+}
+
+/* /bootstrap overrides */
+
+
 input::selection {
   background: #f3f3f3;
 }
@@ -100,10 +109,6 @@ input::-moz-selection {
 	padding:10px 10px 10px 10px;
 	border-bottom: 1px solid #eeeeee;
 	display:inline-block;
-    //-webkit-transition-property: box-shadow, border; /* Safari */
-    //-webkit-transition-duration: .2s; /* Safari */
-    //transition-property: box-shadow, border;
-    //transition-duration: .2s;	
     -webkit-transition: max-height .3s ease-in-out;
     transition: max-height .3s ease-in-out;	
 	transition-property: max-height,opacity;
@@ -111,9 +116,9 @@ input::-moz-selection {
 }
 
 .list-item-main:hover {
-    //-moz-box-shadow: 3px 3px 15px #eeeeee;
-    //-webkit-box-shadow: 3px 3px 15px #eeeeee;
-    //box-shadow:  3px 3px 15px #eeeeee;
+	background:#f6f6f6;
+}
+.list-item-main.active {
 	background:#f6f6f6;
 }
 
