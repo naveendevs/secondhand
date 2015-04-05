@@ -61,6 +61,16 @@ function init() {
 		}
 	}
 
+$('#filter-invoice, #filter-warranty').click(function() {
+	if ($(this).data("value") == "0") {
+		$(this).data("value", "1");
+		$(this).find('.filter-content > .filter-icon')[0].dataset['icon'] = "\uE047";
+	} else {
+		$(this).data("value", "0");
+		$(this).find('.filter-content > .filter-icon')[0].dataset['icon'] = "\uE046";
+	}
+});
+	
 var circle;
 var radiusMarker;
 var centerMarker;
@@ -153,15 +163,15 @@ function initializeMap() {
         new google.maps.Point(16, 16)
     );
 
-	var imageMarker = new google.maps.MarkerImage("images/loc.png",
-        new google.maps.Size(32, 52), 
+	var imageMarker = new google.maps.MarkerImage("images/loc-new.png",
+        new google.maps.Size(32, 42), 
         new google.maps.Point(0,0),
-        new google.maps.Point(16, 52)
+        new google.maps.Point(16, 42)
     );
-	var imageMarkerSelected = new google.maps.MarkerImage("images/loc.png",
-        new google.maps.Size(32, 52), 
+	var imageMarkerSelected = new google.maps.MarkerImage("images/loc-new.png",
+        new google.maps.Size(32, 42), 
         new google.maps.Point(0,0),
-        new google.maps.Point(16, 52)
+        new google.maps.Point(16, 42)
     );
 	
     infoBox = new InfoBox({
@@ -180,7 +190,7 @@ function initializeMap() {
 	
     var selectMarkerInfoBox = new InfoBox({
 		disableAutoPan: true,
-		pixelOffset: new google.maps.Size(-115, -130),
+		pixelOffset: new google.maps.Size(-110, -120),
 		zIndex: 10,
         closeBoxURL: "",
         infoBoxClearance: new google.maps.Size(1, 1)
@@ -351,18 +361,18 @@ function listBoxClosure() {
 	
 	get('main-list-tab').addEventListener("mousedown", function(){
 		get('short-list').style.display = "none";
-		get('short-list-tab').className="tab left";
+		$('#short-list-tab').removeClass("active");
 		
 		get('main-list-wrapper').style.display = "block";
-		get('main-list-tab').className="tab active left";
+		$('#main-list-tab').addClass("active");
 		get('sort-wrapper').style.display = "block";
 	});
 	get('short-list-tab').addEventListener("mousedown", function(){
 		get('main-list-wrapper').style.display = "none";
-		get('main-list-tab').className="tab left";
+		$('#main-list-tab').removeClass("active");
 
 		get('short-list').style.display = "block";
-		get('short-list-tab').className="tab active left";
+		$('#short-list-tab').addClass("active");
 		get('sort-wrapper').style.display = "none";
 	});
 

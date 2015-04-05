@@ -35,6 +35,7 @@ input::-moz-selection {
 .tab.active {
 	background:#FFF;
 	box-shadow: none;
+	cursor:auto;
 }
 
 .tab b{
@@ -43,14 +44,19 @@ input::-moz-selection {
 }
 
 .tab {
-	background:#eee;
-	box-shadow: inset 2px -2px 6px -4px #585858;
+	background:#f5f5f5;
 	width:100%;
 	line-height:40px;
 	height:40px;
 	text-align:center;
 	width:50%;
 	cursor:pointer;
+}
+.tab-left {
+	box-shadow: inset -2px -2px 8px -4px #888;
+}
+.tab-right {
+	box-shadow: inset 2px -2px 8px -4px #888;
 }
 
 
@@ -365,9 +371,9 @@ input::-moz-selection {
 .map-marker-selected-wrapper{
 	border:1px solid #999999;
 	background:#fefefe;
-	padding:5px 5px;
+	padding:5px;
 	width:220px;
-	max-height:60px;
+	max-height:70px;
 	overflow:hidden;
     -moz-box-shadow: 2px 2px 8px #585858;
     -webkit-box-shadow: 2px 2px 8px #888888;
@@ -376,8 +382,23 @@ input::-moz-selection {
 .map-marker-selected-content{
 	margin-left:65px;
 }
+
+.arrow-down {
+	width: 0; 
+	height: 0; 
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
+	border-top: 10px solid #fefefe;
+	margin:0 auto;
+	margin-top:-3px;
+}
+
 .map-marker-selected-title {
 	font-size:14px;
+	width: 150px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 .map-marker-selected-price {
 	font-size:20px;
@@ -557,3 +578,32 @@ input::-moz-selection {
 	cursor:pointer;
 }
 /* /HEADER */
+
+
+/* FILTER */
+.filter-main {
+	height:39px;
+	position:relative;
+	margin-left:0px;
+	min-width:120px;
+	border-left:1px solid #f5f5f5;
+}
+.filter-content{
+	height:39px;
+	position:relative;
+	background:#fff;
+	cursor:pointer;
+}
+.filter-title {
+	line-height:40px;
+	color:#555;
+	padding:0 39px 0 15px;
+}
+.filter-icon {
+	position:absolute;
+	right:10px;
+	color:#555;
+	font-size:20px;
+	line-height:40px;
+}
+/* /FILTER */

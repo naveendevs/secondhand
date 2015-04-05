@@ -97,6 +97,7 @@
 				<div class="map-marker-selected-price"><div class="list-item-price-currency icon left" data-icon="&#xe017;"></div>{{price}}</div>
 			</div>
 		</div>
+		<div class="arrow-down"></div>
 	</script>
 
 	
@@ -416,7 +417,7 @@ input,textarea {
 	border-bottom:1px solid #f1f1f1;
 }
 .filter-wrapper {
-	padding: 8px 0;
+	padding: 0;
 	border-bottom:1px solid #f1f1f1;
 }
 
@@ -1473,12 +1474,44 @@ a {
 		
 		<!-- LISTING -->
 	
-		<div class="tab-wrapper">
-			<div class="tab active left" id="main-list-tab"><b>120</b> Results within 100 kms</div>
-			<div class="tab left" id="short-list-tab"><b id="short-list-shortlisted-count">0</b> Shortlisted</div>
+		<div class="filter-wrapper" style="height:40px;background:;">
+
+			<div class="filter icon left" data-icon="&#xe045;" style="font-size:24px;line-height:40px;padding:0 10px;" data-toggle="tooltip" title="Click to view more filters"></div>
+
+			<div class="left filter-main" id="filter-price" data-value="">
+				<div class="filter-content">
+					<div class="left filter-title">Price</div>
+					<div class="icon filter-icon" data-icon="&#xe00f;"></div>
+				</div>
+			</div>
+
+			<div class="left filter-main" id="filter-used" data-value="">
+				<div class="filter-content">
+					<div class="left filter-title">Used for</div>
+					<div class="icon filter-icon" data-icon="&#xe00f;"></div>
+				</div>
+			</div>
+
+			<div class="left filter-main" id="filter-invoice" data-value="0">
+				<div class="filter-content">
+					<div class="left filter-title">With invoice</div>
+					<div class="icon filter-icon" id="filter-invoice-icon" data-icon="&#xe046;"></div>
+				</div>
+			</div>
+			<div class="left filter-main" id="filter-warranty" data-value="0">
+				<div class="filter-content">
+					<div class="left filter-title">Within warranty</div>
+					<div class="icon filter-icon" id="filter-warranty-icon" data-icon="&#xe046;"></div>
+				</div>
+			</div>
 		</div>
 
-		<div id="short-list" class="invites-wrapper" style="display:none;height:auto;width:100%;top:40px"></div>
+		<div class="tab-wrapper">
+			<div class="tab tab-left active left" id="main-list-tab"><b>120</b> Results within 100 kms</div>
+			<div class="tab tab-right left" id="short-list-tab"><b id="short-list-shortlisted-count">0</b> Shortlisted</div>
+		</div>
+
+		<div id="short-list" class="invites-wrapper" style="display:none;height:auto;width:100%;top:80px"></div>
 
 		<div class="sort-wrapper" id="sort-wrapper">
 			<div class="text-bold"><b>Show</b></div>
@@ -1488,7 +1521,7 @@ a {
 			<div class="sort" id="">High Price</div>
 		</div>
 		
-		<div class="invites-wrapper" style="top:80px" id="main-list-wrapper">
+		<div class="invites-wrapper" style="top:120px" id="main-list-wrapper">
 			<div class="height:auto;width:100%;" id="main-list">
 			<!-- list start -->
 			<!-- list end -->
@@ -1523,5 +1556,6 @@ a {
 
 	//listBoxClosure();
 	//$("#detail-box").css("right",0)
+	
 </script>
 </html>
