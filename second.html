@@ -3,6 +3,7 @@
 <head>
 	<title>SecondHand.com</title>
 	<!-- CSS -->
+	<link rel="icon" href="./images/website_icon.png" type="image/png" />
 	<link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="./css/style.css">
 
@@ -75,7 +76,7 @@
 					<div class="list-item-location left">Used For <span class="list-item-highlight">2 years</span></div>
 					<div class="list-item-location left" style="margin-left:15px;">Condition <span class="list-item-highlight">Bad</span></div>
 				</div>
-				<div class="list-item-price"><div class="list-item-price-currency icon left" data-icon="&#xe017;"></div>{{price}}<span class="list-item-price-negotiable">{{#negotiable}} (Negotiable) {{/negotiable}}</span></div>
+				<div class="list-item-price"><div class="list-item-price-currency icon left" data-icon="&#xe017;"></div>{{price}}<span class="list-item-price-negotiable">{{#negotiable}} Negotiable {{/negotiable}}</span></div>
 				<div class="list-item-time">{{displaypostedDateTime}}</div>
 			</div>
 		</div>
@@ -251,7 +252,9 @@
 	
 	
 	<!-- /MUSTACHE TEMPALTES -->
+
 <style>
+
 html, body {
 	line-height:1.4;
     width:100%;
@@ -370,104 +373,7 @@ input,textarea {
 	opacity:1;
 	cursor:pointer;
 }
-.header-content-search{
-	float:left;
-	margin-right:20px;
-}
-.header-content-search input{
-	width:290px;
-	line-height:25px;
-	padding:0 10px;
-	border:none;
-	border-radius: 3px;
-	opacity:1;
-	display:inline-block;
-	vertical-align:middle;
-}
 
-.filters-wrapper {
-	padding:0 10px 10px 10px;
-	height:auto;
-	float:left;
-	width:220px;
-	margin:15px 0 0 20px;
-	border-right:1px solid #f1f1f1;
-	overflow-y:auto;
-}
-
-.footer-wrapper {
-	height:auto;
-	float:left;
-	width:240px;
-	margin:40px 0 0 20px;
-}
-.footer-link {
-	float:right;
-	margin:0 5px;
-	color:#aaaaaa;
-	cursor:pointer;
-}
-.footer-link:hover {
-	color:#666666;
-}
-
-.filters-filter-head {
-	margin-top:20px;
-	font-weight:700;
-	border-bottom:1px solid #f1f1f1;
-}
-.filter-wrapper {
-	padding: 0;
-	border-bottom:1px solid #f1f1f1;
-}
-
-.filters-filter-wrapper label {
-	float:left;
-}
-.filters-filter-wrapper input,select{
-	margin-top:5px;
-	//width:100%;
-	border:0px solid #f1f1f1;
-	border-top:1px solid #f1f1f1;
-	border-bottom:1px solid #f1f1f1;
-	line-height:25px;
-}
-
-.filter-wrapper:hover {
-	cursor:pointer;
-}
-.filter-wrapper:hover .filter-checkbox:before {
-	color:#aaaaaa;
-	content: attr(data-icon);
-	font-family: 'naveen-font';
-}
-.filter-wrapper:hover .filter-checkbox.active:before {
-	color:#aaaaaa;
-	content: attr(data-icon-alt);
-	font-family: 'naveen-font';
-}
-.filter-checkbox.active:before {
-	color: #333333;
-	content: attr(data-icon);
-	font-family: 'naveen-font';
-}
-.filter-checkbox {
-	border:1px solid #cbcbcb;
-	position:relative;
-	display:block;
-	width:14px;
-	float:left;
-	height:14px;
-	font-size:10px;
-	padding-top:0px;
-	text-align:center;
-	margin-right:10px;
-	border-radius:3px;
-	zoom:1;
-}
-.filter-checkbox-text{
-	width:100%;
-}
 
 #map-content {
 	position:absolute;
@@ -485,14 +391,6 @@ input,textarea {
 	border-radius:0px;
 	border:1px solid #aaaaaa;
 }
-.invites-wrapper::-webkit-scrollbar-thumb:hover{
-//	background-color:#aaaaaa;
-//	border:1px solid #aaaaaa;
-}
-.invites-wrapper::-webkit-scrollbar-thumb:active{
-//background-color:#A6393D;
-//border:1px solid #333333;
-} 
 
 .invites-wrapper {
     position:absolute;
@@ -588,151 +486,6 @@ input,textarea {
 	background:rgb(50,150,50);
 	border-radius:3px;
 }
-.invite-content-rating.excellent {
-	background:#3f7e00;
-}
-.invite-content-rating.verygood {
-	background:#5ba829;
-}
-.invite-content-rating.good {
-	background:#9acd32;
-}
-.invite-content-rating.average{
-	background:#ffba00;
-}
-.invite-content-rating.poor {
-	background:#ff7800;
-}
-.invite-content-userstats {
-	width:300px;
-	height:36px;
-	position:absolute;
-	right:0px;
-	margin-right:15px;
-	text-align:right;
-	line-height:12px;
-	font-size:12px;
-	color:#888888;
-}
-
-.invite-content-userstats span{
-    -webkit-transition-property: color; /* Safari */
-    -webkit-transition-duration: .2s; /* Safari */
-    transition-property: color;
-    transition-duration: .2s;
-}
-.invite-content-userstats span:hover{
-	color:#333333;
-	cursor:pointer;
-}
-
-.invite-icons-box {
-	background: #ee6150;
-	width: 0px;
-	height:100%;
-	float:left;
-}
-
-.invite-content-top {
-	height:23px;
-}
-.invite-content-userdetails{
-	height:20px;
-}
-.invite-content-userdetails div{
-	float:left;
-}
-
-.invite-content-userdetails-location{
-	background:url(images/location.png) no-repeat;
-	margin:-5px 0 0 5px;
-	width:20px;
-	height:24px;
-	float:left;
-}
-
-.invite-content-desc {
-	//background:url(images/left_quote-128.png) no-repeat left top;
-	padding: 6px 0px;
-	font-style:italic;
-	line-height:16px;
-}
-.invite-content-desc-alt{
-	background:url(images/right_quote-128.png) no-repeat right bottom;
-	line-height:17px;
-}
-.invite-content-age{
-	font-size:13px;
-	float:left;
-	margin-left:10px;
-	height:20px;
-	line-height:20px;
-}
-
-.invite-content-opento {
-	margin-top:5px;
-	line-height:20px;
-	height:20px;
-}
-.invite-content-opento-head {
-	float:left;
-	color:#666666;
-	margin-right:3px;
-	//font-weight:600;
-}
-.invite-content-opento-value {
-	float:left;
-	margin-left: 2px;
-	padding:2px 10px;
-	border-radius: 10px;
-	line-height:15px;
-	background: #f2f2f2;
-}
-
-.invite-content-openfor {
-	margin-top:5px;
-	line-height:20px;
-	height:20px;
-}
-.invite-content-openfor-head {
-	margin-right:3px;
-	float:left;
-	color:#666666;
-	//font-weight:600;
-}
-.invite-content-openfor-value {
-	float:left;
-	margin-left: 2px;
-	padding:2px 10px;
-	border-radius: 10px;
-	line-height:15px;
-	color:#fefefe;
-	background: #ee6150;
-	color:#333333;
-	background: #f2f2f2;
-}
-.invite-content-actions-wrapper {
-		margin-top:10px;
-}
-.invite-content-action {
-	float:left;
-	margin-right: 6px;
-	padding:0px 10px;
-	border-radius: 8px;
-	font-size:13px;
-	line-height:22px;
-	height:22px;
-	color:#aaaaaa;
-	border:1px solid #aaaaaa;
-    -webkit-transition-property: color; /* Safari */
-    -webkit-transition-duration: .2s; /* Safari */
-    transition-property: color;
-    transition-duration: .2s;
-}
-.invite-content-action:hover {
-	color:#888888;
-	cursor:pointer;
-}
 
 #map-wrapper {
 	width: 100%;
@@ -752,15 +505,6 @@ input,textarea {
 	border-radius:0px;
 	border:1px solid #aaaaaa;
 }
-.detail-box-content::-webkit-scrollbar-thumb:hover{
-//	background-color:#aaaaaa;
-//	border:1px solid #aaaaaa;
-}
-.detail-box-content::-webkit-scrollbar-thumb:active{
-//background-color:#A6393D;
-//border:1px solid #333333;
-} 
-
 .detail-box-loading-wrapper {
 	bottom:0;
 	width:500px;
@@ -1408,10 +1152,8 @@ a {
 </div>
 
 <header class="header-box">
-	<div class="header-logo"></div>
 	<div class="header-content">
-		<div class="header-content-logo">SECONDHAND</div>
-
+		<div class="header-content-logo"></div>
 		<div class="left" style="margin-left:10px;padding-top:6px;position:relative;width:250px;height:40px;line-height:38px;">
 			<span>
 				<input class="header-filter-input left" id="header-select-locality" style="background:#fdfdfd;" placeholder="Search by locality or landmark" autocomplete="off" spellcheck="false" dir="auto">
@@ -1474,7 +1216,7 @@ a {
 		
 		<!-- LISTING -->
 	
-		<div class="filter-wrapper" style="height:40px;background:;">
+		<div class="filter-wrapper" style="height:40px;border-bottom:1px solid #efefef;">
 
 			<div class="filter icon left" data-icon="&#xe045;" style="font-size:24px;line-height:40px;padding:0 10px;" data-toggle="tooltip" title="Click to view more filters"></div>
 
@@ -1483,6 +1225,16 @@ a {
 					<div class="left filter-title">Price</div>
 					<div class="icon filter-icon" data-icon="&#xe00f;"></div>
 				</div>
+				<ul class="filter-options dropdown">
+					<li class="left" style="display:inline-flex" data-value="LT-1000" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>< 1K</li>
+					<li class="left" style="display:inline-flex" data-value="1000-2000" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>1K - 2K</li>
+					<li class="left" style="display:inline-flex" data-value="2000-5000" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>2K - 5K</li>
+					<li class="left" style="display:inline-flex" data-value="5000-10000" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>5K - 10K</li>
+					<li class="left" style="display:inline-flex" data-value="10000-20000" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>10K - 20K</li>
+					<li class="left" style="display:inline-flex" data-value="20000-30000" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>20K - 30K</li>
+					<li class="left" style="display:inline-flex" data-value="30000-50000" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>30K - 50K</li>
+					<li class="left" style="display:inline-flex" data-value="GT-50000" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>50K +</li>
+				</ul>
 			</div>
 
 			<div class="left filter-main" id="filter-used" data-value="">
@@ -1490,6 +1242,16 @@ a {
 					<div class="left filter-title">Used for</div>
 					<div class="icon filter-icon" data-icon="&#xe00f;"></div>
 				</div>
+				<ul class="filter-options dropdown">
+					<li class="left" style="display:inline-flex" data-value="LT-M-1" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>< 1 month</li>
+					<li class="left" style="display:inline-flex" data-value="LT-M-6" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>< 6 months</li>
+					<li class="left" style="display:inline-flex" data-value="LT-Y-1" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>< 1 year</li>
+					<li class="left" style="display:inline-flex" data-value="Y-1-2" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>1 - 2 years</li>
+					<li class="left" style="display:inline-flex" data-value="Y-2-3" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>2 - 3 years</li>
+					<li class="left" style="display:inline-flex" data-value="Y-3-4" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>3 - 4 years</li>
+					<li class="left" style="display:inline-flex" data-value="Y-4-5" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>4 - 5 years</li>
+					<li class="left" style="display:inline-flex" data-value="GT-Y-5" data-toggle="0"><span class="filter-option-icon icon left icon-large margin-right-10" data-icon="&#xe046;"></span>5 + years</li>
+				</ul>
 			</div>
 
 			<div class="left filter-main" id="filter-invoice" data-value="0">
@@ -1535,7 +1297,7 @@ a {
 
 	<!-- /LISTING -->
 
-	
+
 	<!-- Detail holder -->
 	<div id="detail-box" class="detail-box-wrapper">
 		<div id="detail-box-main" class="detail-box-content-wrapper">
@@ -1548,14 +1310,12 @@ a {
 </div>
 
 </body>
-<script>
-	init();
-	//google.maps.event.addDomListener(window, 'load', initialize());
-	//cal = new nCalendarClosure('details-box-send-request');
-	//detailBox.init();
 
-	//listBoxClosure();
-	//$("#detail-box").css("right",0)
-	
+<script>
+	// initialize JS
+	init();
+
+	//google.maps.event.addDomListener(window, 'load', initialize());
 </script>
+
 </html>

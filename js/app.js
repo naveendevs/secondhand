@@ -70,7 +70,37 @@ $('#filter-invoice, #filter-warranty').click(function() {
 		$(this).find('.filter-content > .filter-icon')[0].dataset['icon'] = "\uE046";
 	}
 });
+
+$('#filter-used, #filter-price').click(function(e) {
+	e.stopPropagation();
+	e.preventDefault();
+
+	if ($(this).find('.filter-options.active').length) {
+		$(this).find('.filter-options').removeClass('active');
+		return false;
+	}
+	$(".dropdown.active").removeClass('active');
+	$(this).find('.filter-options').toggleClass('active');
+});
+
+$('#filter-used, #filter-price').on("click", 'li', function(e) {
+	e.stopPropagation();
+	e.preventDefault();
 	
+	if ($(this).data("toggle") == "0") {
+		$(this).data("toggle", "1");
+		$(this).find('.filter-option-icon')[0].dataset['icon'] = "\uE047";
+	} else {
+		$(this).data("toggle", "0");
+		$(this).find('.filter-option-icon')[0].dataset['icon'] = "\uE046";
+	}
+});
+
+//hide any active dropdown - filters
+$(document).click(function(){
+	$(".dropdown.active").removeClass('active');
+});
+
 var circle;
 var radiusMarker;
 var centerMarker;
