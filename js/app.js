@@ -96,9 +96,39 @@ $('#filter-used, #filter-price').on("click", 'li', function(e) {
 	}
 });
 
+$('#header-select-locality').on('keyup', function() {
+	getPlacesPredictions(this.value);
+});
+$('#header-select-locality').click(function(e) {
+	e.stopPropagation();
+	e.preventDefault();
+	$('#header-select-locality-results').show();
+});
+$('#header-select-locality').focus(function() {
+	$(this).select();
+	if ($('#header-select-locality-results').css('display') == 'none')
+		$('#header-select-locality-results').show();
+});
+
+
+$(document).on("click", '.tt-suggestion', function(e) {
+	$('#header-select-locality').val($(this).attr('data-value'));
+	$('#header-select-locality-results').hide();
+
+	var placesService = new google.maps.places.PlacesService(map);
+	placesService.getDetails({placeId: $(this).attr('data-placeid')}, function(place, status) {
+	  if (status == google.maps.places.PlacesServiceStatus.OK) {
+		console.log(mapObj);
+		mapObj.setLocation(place.geometry.location);
+	  }
+	});	
+})
+
+
 //hide any active dropdown - filters
 $(document).click(function(){
 	$(".dropdown.active").removeClass('active');
+	$('#header-select-locality-results').hide();
 });
 
 var circle;
@@ -106,8 +136,26 @@ var radiusMarker;
 var centerMarker;
 var radiusInfo;
 //var map;
-
 var mapObj;
+
+
+//Map places prediction methods
+var getPlacesPredictions = function(text) {
+	if (text) {
+	var service = new google.maps.places.AutocompleteService();
+	service.getPlacePredictions({ input: text, componentRestrictions: {country: 'in'}}, getPlacesPredictionsCallback);
+  }
+}
+var getPlacesPredictionsCallback = function(predictions, status) {
+	if (status != google.maps.places.PlacesServiceStatus.OK) {
+		return;
+	}
+	for(var i in predictions){
+		predictions[i].description = predictions[i].description.split(', India')[0];
+	}
+	$('#header-select-locality-results').html(Mustache.render($('#locality_filter_typeahead_results_el').html(), {predictions: predictions}));
+}	
+
 
 function initializeMap() {
 	var markerCache = {};
@@ -310,7 +358,7 @@ function initializeMap() {
 	});
 
 	//bounds = circle.getBounds();
-	
+
 	function drawResultsOnMap(json) {
 		for (var i = 0, length = json.length; i < length; i++) {
 		function inner(data) {
@@ -375,6 +423,18 @@ function initializeMap() {
 		unhighlightMarker: function(_id) {
 			markerCache[_id].setIcon(imageMarker);
 			selectMarkerInfoBox.close();
+		},
+		setLocation: function(loc) {
+			var mapOptions={
+				center : {
+					lat : loc.lat(),
+					lng : loc.lng()
+				}
+			};
+			centerMarker.setPosition(mapOptions.center);
+			circle.setCenter(mapOptions.center);
+			radiusMarker.setPosition({lat: circle.getCenter().lat() - ((circle.getRadius()/6378137)*180/3.14), lng: d=circle.getCenter().lng()});
+			map.panTo(mapOptions.center);
 		}
 	}
 }

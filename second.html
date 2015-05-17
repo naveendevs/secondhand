@@ -8,7 +8,8 @@
 	<link rel="stylesheet" type="text/css" href="./css/style.css">
 
 	<!-- JS Libraries-->
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDy_hwukpPRvw24Tr0J2sAM6iofOHQEThk"></script>
+    <!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDy_hwukpPRvw24Tr0J2sAM6iofOHQEThk"></script> -->
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDy_hwukpPRvw24Tr0J2sAM6iofOHQEThk&libraries=places"></script>
 	<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
 	<script type="text/javascript" src="js/lib/jquery-1.10.1.min.js"></script>
 	<script type="text/javascript" src="js/lib/mustache.min.js"></script>
@@ -101,7 +102,23 @@
 		<div class="arrow-down"></div>
 	</script>
 
-	
+	<!-- LOCALITY FILTER RESULTS -->
+	<script id="locality_filter_typeahead_results_el" type="text/html">
+		<div class="tt-section-results">
+			<span class="tt-suggestions" style="display: block;">
+				{{#predictions}}
+				<div class="tt-suggestion" data-value="{{description}}" data-placeid = "{{place_id}}">
+					<div class="recent" style="white-space: normal;">
+						<span class="icon left" style="padding:0 5px;" data-icon="&#xe006;"></span>
+						<span class="result-text">{{description}}</span>
+					</div>
+				</div>
+				{{/predictions}}
+			</span>
+		</div>
+	</script>
+
+	<!-- DETAIL TMPL -->
 	<script id="detail-box-tmpl" type="text/html">
 	
 			<!-- detail fixed -->
@@ -1154,17 +1171,20 @@ a {
 <header class="header-box">
 	<div class="header-content">
 		<div class="header-content-logo"></div>
-		<div class="left" style="margin-left:10px;padding-top:6px;position:relative;width:250px;height:40px;line-height:38px;">
+		<div class="left" style="margin-left:10px;padding-top:6px;position:relative;width:300px;height:40px;line-height:38px;">
 			<span>
-				<input class="header-filter-input left" id="header-select-locality" style="background:#fdfdfd;" placeholder="Search by locality or landmark" autocomplete="off" spellcheck="false" dir="auto">
+				<input class="header-filter-input left" id="header-select-locality" style="background:#fdfdfd;width:300px;" placeholder="Search by locality or landmark" autocomplete="off" spellcheck="false" dir="auto">
 			</span>
 			<span class="icons" style="position:absolute;right:10px;color:#555;z-index:1;font-size:16px;">
 				<i class="marker-icon icon" style="display: inline; width:20px;height:20px;font-style: normal;" data-icon="&#xe006;"></i>
 			</span>
+			<span id="header-select-locality-results" class="tt-dropdown-menu" style="position: absolute; z-index: 100; display:; left: 0px;">
+				<!-- typeahead results tmpl -->
+			</span>
 		</div>
-		<div class="left" style="margin-left:10px;padding-top:6px;position:relative;width:250px;height:40px;line-height:38px;">
+		<div class="left" style="margin-left:10px;padding-top:6px;position:relative;width:300px;height:40px;line-height:38px;">
 			<span>
-				<input class="header-filter-input left" id="header-select-text" style="background:#fdfdfd;" placeholder="Looking for..." autocomplete="off" spellcheck="false" dir="auto">
+				<input class="header-filter-input left" id="header-select-text" style="background:#fdfdfd;width:300px;" placeholder="Looking for..." autocomplete="off" spellcheck="false" dir="auto">
 			</span>
 			<span class="icons" style="position:absolute;right:10px;color:#555;z-index:1;font-size:16px;">
 				<i class="marker-icon icon" style="display: inline; width:20px;height:20px;font-style: normal;" data-icon="&#xe009;"></i>
@@ -1313,7 +1333,9 @@ a {
 
 <script>
 	// initialize JS
-	init();
+	$(document).ready(function(){
+		init();
+	});
 
 	//google.maps.event.addDomListener(window, 'load', initialize());
 </script>

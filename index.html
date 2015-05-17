@@ -1,0 +1,325 @@
+<!doctype html>
+<html>
+<head>
+	<title>SecondHand.com</title>
+	<!-- CSS -->
+	<link rel="icon" href="./images/website_icon.png" type="image/png" />
+	<link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="./css/style.css">
+
+	<!-- JS Libraries-->
+    <!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDy_hwukpPRvw24Tr0J2sAM6iofOHQEThk"></script> -->
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDy_hwukpPRvw24Tr0J2sAM6iofOHQEThk&libraries=places"></script>
+	<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
+	<script type="text/javascript" src="js/lib/jquery-1.10.1.min.js"></script>
+	<script type="text/javascript" src="js/lib/mustache.min.js"></script>
+
+	<!-- JS APP -->
+	<script type="text/javascript" src="js/nCalendar.js"></script>
+	<script type="text/javascript" src="js/app.js"></script>
+
+	<!-- MUSTACHE TEMPLATES-->
+
+	<!-- LOCALITY FILTER RESULTS -->
+	<script id="locality_filter_typeahead_results_el" type="text/html">
+		<div class="tt-section-results">
+			<span class="tt-suggestions" style="display: block;">
+				{{#predictions}}
+				<div class="tt-suggestion" data-value="{{description}}" data-placeid = "{{place_id}}">
+					<div class="recent" style="white-space: normal;">
+						<span class="icon left" style="padding:0 5px;" data-icon="&#xe006;"></span>
+						<span class="result-text">{{description}}</span>
+					</div>
+				</div>
+				{{/predictions}}
+			</span>
+		</div>
+	</script>
+
+	<!-- /MUSTACHE TEMPALTES -->
+
+<style>
+
+html, body {
+	line-height:1.4;
+    width:100%;
+    height:100%;
+    padding:0;
+    margin:0;
+	overflow-y:hidden;
+	-webkit-tap-highlight-color: transparent;
+	-webkit-font-smoothing: antialiased;	
+}
+
+.left {
+	float:left;
+}
+
+::selection {
+  background: transparent;
+}
+::-moz-selection {
+  background: transparent;
+}
+
+@font-face {
+	font-family: 'naveen-font';
+	src:url('fonts/naveen-font.eot');
+	src:url('fonts/naveen-font.eot?#iefix') format('embedded-opentype'),
+		url('fonts/naveen-font.woff') format('woff'),
+		url('fonts/naveen-font.ttf') format('truetype'),
+		url('fonts/naveen-font.svg#naveen-font') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+.icon[data-icon]:before {
+	font-family: 'naveen-font';
+	content: attr(data-icon);
+	font-weight: 400;
+	font-variant: normal;
+	text-transform: none;
+	display:block;
+	zoom:1;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+body {
+	font-size:13px;
+	color: #333333;
+	font-family: "Open Sans","Helvetica Neue",Helvetica,Calibri,Arial,sans-serif;
+}
+
+input,textarea {
+	border:1px solid #aaaaaa;
+	outline: none;
+}
+
+.filter-box {
+	position:fixed;
+	z-index:99999;
+	background-color: #005387;
+	background-color: #0a3151;
+	height: 40px;
+	width:100%;
+    -moz-box-shadow: 0px 1px 1px #585858;
+    -webkit-box-shadow: 0px 1px 1px #585858;
+    box-shadow:  0px 1px 1px #585858;
+	border:0;
+}
+
+.map-infobox {
+	line-height:15px;
+	text-align:center;
+	border:1px solid #999999;
+	background:#fefefe;
+	padding:5px 10px;
+    -moz-box-shadow: 2px 2px 8px #585858;
+    -webkit-box-shadow: 2px 2px 8px #888888;
+    box-shadow: 2px 2px 8px #888888;
+}
+.map-infobox-highlight {
+	font-weight:700;
+}
+
+.map-ui-zoomin {
+	position:absolute;
+	width:32px;
+	height:32px;
+	background:URL(images/zoomin_marker.png);
+	top:10px;
+	left:10px;
+	z-index:1;
+	opacity:.8;
+    -webkit-transition-property: opacity; /* Safari */
+    -webkit-transition-duration: .2s; /* Safari */
+    transition-property: opacity;
+    transition-duration: .2s;
+}
+.map-ui-zoomin:hover { 
+	opacity:1;
+	cursor:pointer;
+}
+.map-ui-zoomout {
+	position:absolute;
+	width:32px;
+	height:32px;
+	background:URL(images/zoomout_marker.png);
+	top:42px;
+	z-index:1;
+	left:10px;
+	opacity:.8;
+    -webkit-transition-property: opacity; /* Safari */
+    -webkit-transition-duration: .2s; /* Safari */
+    transition-property: opacity;
+    transition-duration: .2s;
+}
+.map-ui-zoomout:hover { 
+	opacity:1;
+	cursor:pointer;
+}
+
+
+#map-content {
+	position:absolute;
+	width:100%;
+	top:50px;
+	bottom:0;
+}
+
+a {
+	text-decoration:none;
+	color:#333333;
+}
+.action {
+	cursor:pointer;
+}
+
+.action-btn {
+	line-height:2;
+	padding:0 10px;
+    -webkit-transition-property: box-shadow;
+    -webkit-transition-duration: .2s;
+    transition-property: box-shadow;
+    transition-duration: .2s;
+}
+.action-btn:hover {
+	cursor:pointer;
+    -moz-box-shadow: 3px 3px 15px #eeeeee;
+    -webkit-box-shadow: 3px 3px 15px #eeeeee;
+    box-shadow:  3px 3px 15px #eeeeee;
+}
+
+
+#wrapper {
+    width:100%;
+    height:100%;
+    padding:0;
+    margin:0;
+	overflow-y:hidden;
+}
+#left {
+    position:absolute;
+    left:0;
+    width:250px;
+    height:100%;
+}
+
+#center {
+    height:100%;
+    margin: 0 555px 0 0px;
+}
+
+#right {
+    position:absolute;
+    right:0;
+    top:50px;
+	bottom:0;
+    width:555px;
+	background: #222222;
+	background: #fff;
+    -moz-box-shadow: -1px 3px 3px #585858;
+    -webkit-box-shadow: -1px 3px 3px #585858;
+    box-shadow:  -1px 0px 3px #585858;
+	border:0;	
+}
+
+.separator-95{
+	border-bottom:1px solid #eeeeee;
+	height:10px;
+	margin:10px 10px 0px 10px;
+	clear:both;
+}
+
+.clearfix:after {
+	visibility:hidden;
+	display:block;
+	font-size:0;
+	content: ".";
+	clear:both;
+	height:0;
+	line-height:
+}
+.clearfix {
+	display: inline-block;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<header class="header-box" style="background:none;box-shadow:none">
+	<div class="header-content">
+		<div class="header-content-logo"></div>
+
+		<div class="header-nav-wrapper" style="">
+			<div class="header-nav-menu left" style="border-radius:2px;margin:9px 15px 0 0;line-height:30px;border:1px solid #fafafa;">SELL ON SECONDHAND</div>
+			<div class="header-nav-menu left">BLOG</div>
+			<div class="header-nav-menu left">WE'RE HIRING</div>
+			<div class="header-nav-menu left">LOGIN</div>
+			<div class="header-nav-menu left icon" data-icon="&#xe005;"></div>
+		</div>
+	</div>
+</header>
+
+<div style="width:100%;height:100%;background: url(images/pics/bg.png) no-repeat 0 -150px;background-size:cover;">
+
+	<div style="padding-top:200px;font-weight:700;font-size:40px;color:#fff;text-align:center; text-shadow: 1px 1px 4px #444444;">BUY USED STUFF WITH CONFIDENCE</div>
+	<div style="padding-top:10px;font-weight:600;font-size:16px;color:#fff;text-align:center;  text-shadow: 1px 1px 4px #444444;">Stuff near you with map-based search. Real pictures. Verified entries.</div>
+
+	<div style="padding:15px 15px; width:745px; position:relative; margin:auto;overflow:visible; margin-top:40px; ">
+
+		<div style="opacity:0.5;background:#333; padding:15px 15px; width:742px; position:absolute; top:0;left:0;height:70px;z-index:0;">
+		</div>
+	
+		<div class="left" style="position:relative;width:300px;height:40px;line-height:38px;">
+			<span>
+				<input class="header-filter-input left" id="header-select-locality" style="background:#fdfdfd;width:300px;" placeholder="Search by locality or landmark" autocomplete="off" spellcheck="false" dir="auto">
+			</span>
+			<span class="icons" style="position:absolute;right:10px;color:#555;z-index:1;font-size:16px;">
+				<i class="marker-icon icon" style="display: inline; width:20px;height:20px;font-style: normal;" data-icon="&#xe006;"></i>
+			</span>
+			<span id="header-select-locality-results" class="tt-dropdown-menu" style="position: absolute; z-index: 100; display: none;border:none; left: 0px;">
+				<!-- typeahead results tmpl -->
+			</span>
+		</div>
+		<div class="left" style="margin-left:10px;position:relative;width:300px;height:40px;line-height:38px;">
+			<span>
+				<input class="header-filter-input left" id="header-select-text" style="background:#fdfdfd;width:300px;" placeholder="Looking for..." autocomplete="off" spellcheck="false" dir="auto">
+			</span>
+			<span class="icons" style="position:absolute;right:10px;color:#555;z-index:1;font-size:16px;">
+				<i class="marker-icon icon" style="display: inline; width:20px;height:20px;font-style: normal;" data-icon="&#xe009;"></i>
+			</span>
+		</div>
+		
+		<div class="btn btn-primary" style="margin-left:10px; height:38px;padding-top:8px;position:relative;" id="search-btn">
+			<span class="icon left" style="width:20px;text-align:left;" data-icon="&#xe009;"></span>
+			Search
+		</div>
+		
+	</div>
+
+<div style="width:200px;height:100px; margin:40px auto;">
+		<div class="btn btn-danger" style="height:38px;padding-top:8px;margin:auto;width:auto;display:block;">
+			SELL ON SECONDHAND
+		</div>
+	
+</div>
+</div>
+</body>
+
+<script>
+	// initialize JS
+	$(document).ready(function(){
+		$('#search-btn').click(function() {
+			window.location.href = "second.html"
+		})		
+		init();
+	});
+
+	//google.maps.event.addDomListener(window, 'load', initialize());
+</script>
+
+</html>
